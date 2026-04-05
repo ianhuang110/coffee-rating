@@ -1,0 +1,784 @@
+// 會員系統模擬
+let currentUser = localStorage.getItem('coffee_user') || null;
+
+function renderAuth() {
+  const disp = document.getElementById('user-display');
+  const btnLogin = document.getElementById('btn-login');
+  const btnLogout = document.getElementById('btn-logout');
+  const reviewForm = document.getElementById('review-form');
+  const loginPrompt = document.getElementById('login-prompt');
+  
+  if (currentUser) {
+    disp.textContent = `歡迎，${currentUser}`;
+    btnLogin.classList.add('hidden');
+    btnLogout.classList.remove('hidden');
+    if (reviewForm) reviewForm.style.display = 'flex';
+    if (loginPrompt) loginPrompt.style.display = 'none';
+  } else {
+    disp.textContent = '';
+    btnLogin.classList.remove('hidden');
+    btnLogout.classList.add('hidden');
+    if (reviewForm) reviewForm.style.display = 'none';
+    if (loginPrompt) loginPrompt.style.display = 'block';
+  }
+}
+
+// 咖啡資料庫
+const coffeeData = [
+  // 台北市
+  {
+    cafe: "Simple Kaffa 興波咖啡",
+    location: "台北市",
+    coffees: [
+      { id: "t1", name: "巴拿馬 翡翠莊園 藝伎 (水洗)", desc: "世界冠軍級別的優雅茉莉花香、佛手柑與極致乾淨的口感。", stats: [5, 4, 4.5, 3, 4.5] },
+      { id: "t2", name: "衣索比亞 谷吉 罕貝拉 (日曬)", desc: "濃郁的草莓果醬、水蜜桃甜感與熱情奔放的熱帶水果香。", stats: [4.5, 3.5, 4.5, 3.5, 4] }
+    ]
+  },
+  {
+    cafe: "Fika Fika Cafe",
+    location: "台北市",
+    coffees: [
+      { id: "t3", name: "肯亞 冽里 AA (水洗)", desc: "明亮的黑醋栗、小番茄風味，口感厚實醇淨。", stats: [4, 4.5, 3.5, 4, 3.5] },
+      { id: "t4", name: "哥斯大黎加 塔拉珠 (蜜處理)", desc: "柔和的榛果、烤蘋果與蜂蜜甜潤，相當平衡。", stats: [3.5, 2.5, 4, 3.5, 3.5] }
+    ]
+  },
+  // 桃園市
+  {
+    cafe: "豆舖咖啡館",
+    location: "桃園市",
+    coffees: [
+      { id: "p1", name: "衣索比亞 耶加雪菲 (日曬)", desc: "奔放的莓果香氣與柑橘酸質，口感乾淨清新。", stats: [4.5, 4, 3.5, 2.5, 3.5] },
+      { id: "p2", name: "衣索比亞 谷吉 罕貝拉", desc: "草莓果醬、水蜜桃甜感與熱帶水果香。", stats: [4.5, 3.5, 4.5, 3.5, 4] },
+      { id: "p3", name: "印尼 蘇門答臘 曼特寧", desc: "濃烈厚實的黑巧克力、草藥與木質調，幾乎無酸。", stats: [3, 1, 2.5, 5, 4] },
+      { id: "p4", name: "巴拿馬 藝伎 (水洗)", desc: "優雅茉莉花香、佛手柑與極致乾淨的口感。", stats: [5, 4, 4.5, 3, 4.5] },
+      { id: "p5", name: "哥倫比亞 粉紅波旁", desc: "甜美櫻桃、覆盆子明亮酸值，乾淨多汁。", stats: [4, 4, 4.5, 3, 4] },
+      { id: "p6", name: "瓜地馬拉 花神", desc: "經典細緻花香、烤核桃焦糖甜感。", stats: [4, 3, 4, 4, 3.5] },
+      { id: "p7", name: "肯亞 AA", desc: "渾厚的烏梅、小番茄風味，明亮酸質。", stats: [4, 4.5, 3.5, 4, 3.5] },
+      { id: "p8", name: "牙買加 藍山", desc: "極致平衡，溫和的堅果、可可甜與無負擔的滑順口感。", stats: [4, 2, 4.5, 3.5, 4.5] }
+    ]
+  },
+  {
+    cafe: "SIDRA 栖爪咖啡",
+    location: "桃園市",
+    coffees: [
+      { id: "s1", name: "哥倫比亞 玫瑰谷 (雙重厭氧)", desc: "極度張揚的水蜜桃、草莓乳酸與馥郁的玫瑰花香。", stats: [5, 3.5, 4.5, 3, 4] },
+      { id: "s2", name: "哥斯大黎加 音樂家系列 (莫札特)", desc: "玫瑰花、草莓果醬、甚至有些微酒香發酵味。", stats: [4.5, 3, 4.5, 3.5, 4] },
+      { id: "s3", name: "衣索比亞 西達摩", desc: "優雅的白花香，柳橙與檸檬酸值。", stats: [4, 4, 3.5, 2.5, 3.5] },
+      { id: "s4", name: "蒲隆地 單一莊園", desc: "乾淨醇厚，帶有梅子、深色莓果的調性。", stats: [3.5, 3.5, 4, 4, 3.5] },
+      { id: "s5", name: "薩爾瓦多 帕卡瑪拉", desc: "奶油、太妃糖柔滑口感與無花果甜香。", stats: [4, 2.5, 4.5, 4, 4] }
+    ]
+  },
+  {
+    cafe: "ML coffee 慕光咖啡工作室",
+    location: "桃園市",
+    coffees: [
+      { id: "ml1", name: "台灣 阿里山特等獎得獎豆", desc: "獨特高山茶韻，帶有蜜香與細緻李子酸甜。", stats: [4, 3, 4.5, 3.5, 4.5] },
+      { id: "ml2", name: "衣索比亞 耶加雪菲 (G1)", desc: "撲鼻的檸檬皮、茉莉花與淡雅蜂蜜甜感。", stats: [4.5, 4, 4, 2.5, 4] },
+      { id: "ml3", name: "宏都拉斯 單一莊園微批次", desc: "柳橙、堅果、鮮明的焦糖尾韻。", stats: [3.5, 3.5, 4, 3.5, 3.5] }
+    ]
+  },
+  {
+    cafe: "Jo's Corner Café",
+    location: "桃園市",
+    coffees: [
+      { id: "jc1", name: "哥斯大黎加 塔拉珠", desc: "柔和的榛果、烤蘋果與蜂蜜甜潤，相當平衡。", stats: [3.5, 2.5, 4, 3.5, 3.5] },
+      { id: "jc2", name: "巴西 喜拉朵 (Cerrado)", desc: "溫和低酸，充滿花生、核桃與淡淡的黑糖甜。", stats: [3, 1.5, 4, 4, 3] },
+      { id: "jc3", name: "肯亞 AB", desc: "明亮的黑醋栗、小番茄風味，口感厚實醇淨。", stats: [4, 4.5, 3.5, 4, 3.5] },
+      { id: "jc4", name: "衣索比亞 水洗", desc: "乾淨明亮的檸檬酸值與白花香氣。", stats: [4, 4, 3.5, 2.5, 3.5] }
+    ]
+  },
+  {
+    cafe: "著手咖啡 Coffee Intro (中壢內壢店)",
+    location: "桃園市",
+    coffees: [
+      { id: "in1", name: "衣索比亞 罕貝拉 (淺焙)", desc: "奔放的水蜜桃、草莓風味與伯爵茶香。", stats: [4.5, 3.5, 4, 3, 4] },
+      { id: "in2", name: "哥倫比亞 薇拉 (中深焙)", desc: "濃郁的黑巧克力、焦糖與厚實黏稠的口感。", stats: [3, 2, 4, 4.5, 4] },
+      { id: "in3", name: "印尼 蘇門答臘 塔瓦湖", desc: "經典曼特寧草本香料、黑巧克力微苦回甘。", stats: [3, 1, 3, 5, 4.5] }
+    ]
+  },
+  {
+    cafe: "拾事咖啡 SEIZE THE DAY",
+    location: "桃園市",
+    coffees: [
+      { id: "st1", name: "瓜地馬拉 薇薇特南果", desc: "柑橘酸值明亮，尾韻帶有深焙太妃糖甜感。", stats: [3.5, 3.5, 4, 3.5, 3.5] },
+      { id: "st2", name: "哥斯大黎加 黑蜜處理", desc: "深色莓果與葡萄乾氣息，糖漿般的濃郁。", stats: [4, 3, 4.5, 4.5, 3.5] },
+      { id: "st3", name: "衣索比亞 日曬原生種", desc: "豐富的熱帶水果與奔放的酒香感。", stats: [4.5, 4, 4, 3.5, 4] }
+    ]
+  },
+  {
+    cafe: "暖空咖啡 Warm air Kafe",
+    location: "桃園市",
+    coffees: [
+      { id: "wa1", name: "哥倫比亞 厭氧發酵處理", desc: "帶著鮮明白酒香氣、肉桂與蘋果派的獨特風味。", stats: [4.5, 3.5, 4, 3.5, 4] },
+      { id: "wa2", name: "肯亞 涅里", desc: "經典黑醋栗、小番茄強烈酸值，洛神花尾韻。", stats: [4, 4.5, 3.5, 3.5, 4] }
+    ]
+  },
+  // 新竹市
+  {
+    cafe: "墨咖啡 Ink Coffee",
+    location: "新竹市",
+    coffees: [
+      { id: "h1", name: "薩爾瓦多 庇護所莊園 (半洗)", desc: "溫和流淌的杏仁、奶油口感，甜度極佳。", stats: [3.5, 2.5, 4.5, 4, 4] },
+      { id: "h2", name: "哥斯大黎加 鑽石山 (黑蜜)", desc: "深色莓果與葡萄乾氣息，糖漿般的濃郁。", stats: [4, 3, 4.5, 4.5, 3.5] }
+    ]
+  },
+  // 台中市
+  {
+    cafe: "The Factory Mojocoffee",
+    location: "台中市",
+    coffees: [
+      { id: "m1", name: "瓜地馬拉 安提瓜 (水洗)", desc: "經典的烤核桃、巧克力與非常優雅平衡的酸甜。", stats: [3.5, 3, 4, 4, 3.5] },
+      { id: "m2", name: "薩爾瓦多 帕卡瑪拉 (蜜處理)", desc: "太妃糖、無花果與綿密順滑的奶油油脂感。", stats: [4, 2.5, 4.5, 4, 4] }
+    ]
+  },
+  {
+    cafe: "著手咖啡 Coffee Intro",
+    location: "台中市",
+    coffees: [
+      { id: "i1", name: "宏都拉斯 單一莊園 (水洗)", desc: "柳橙、堅果、鮮明的焦糖尾韻。", stats: [3.5, 3.5, 4, 3, 3.5] },
+      { id: "i2", name: "台灣 阿里山 卓武山 (蜜處理)", desc: "獨特的高山烏龍茶香氣與李子酸甜。", stats: [4, 3, 4, 3.5, 4.5] }
+    ]
+  },
+  // 台南市
+  {
+    cafe: "存憶 Cafe Bar",
+    location: "台南市",
+    coffees: [
+      { id: "c1", name: "葉門 摩卡 馬塔利", desc: "傳統日曬的狂野香料、菸草、紅酒發酵氣息。", stats: [4.5, 3, 3.5, 4.5, 4] },
+      { id: "c2", name: "巴西 喜拉朵 (日曬)", desc: "溫和低酸，充滿花生、核桃與淡淡的黑糖甜。", stats: [3, 1.5, 4, 3.5, 3] }
+    ]
+  },
+  // 高雄市
+  {
+    cafe: "馤咖啡。食作",
+    location: "高雄市",
+    coffees: [
+      { id: "k1", name: "盧安達 穆莎莎 (水洗)", desc: "花香、柑橘、紅茶感，整體輕盈乾淨。", stats: [4, 4, 3.5, 2.5, 4] },
+      { id: "k2", name: "祕魯 查卡馬 (水洗)", desc: "紅蘋果明亮酸質，焦糖回甘與細緻柔和的口感。", stats: [3.5, 4, 4, 3, 3.5] }
+    ]
+  },
+  // 線上精選推薦
+  {
+    cafe: "線上精選",
+    location: "嚴選豆",
+    coffees: [
+      { id: "cr1", name: "哥斯大黎加 塔拉珠聖伊西多羅處理廠蜜處理 藝妓", desc: "蜜處理手法帶來細緻的層次與藝妓特有的優雅花香。", stats: [5, 3.5, 4.5, 3, 4] },
+      { id: "cr2", name: "哥斯大黎加 塔拉珠聖伊西多羅處理廠水洗藝妓", desc: "水洗處理帶來極致純淨的口感，伴隨明亮奔放的白花香氣。", stats: [5, 4, 4, 3, 4.5] },
+      { id: "cr3", name: "哥斯大黎加 布蘭卡奇里波山谷里瓦斯人處理廠 重生莊園黑蜜", desc: "黑蜜處理賦予豆子如糖漿般濃郁的醇厚度與深色莓果風味。", stats: [4, 3, 5, 4.5, 4] },
+      { id: "cr4", name: "宏都拉斯 鞏瑪雅瓜 小樹莊園荷西小農日曬 帕卡瑪拉", desc: "日曬帕卡瑪拉展現奔放的熱帶水果狂野氣息與迷人的酸甜感。", stats: [4.5, 4, 4.5, 4, 4] },
+      { id: "cr5", name: "宏都拉斯 薩卡斯圖梅家族 松林莊園耶爾辛小農日曬 Parainema", desc: "獨特的品種帶來複雜的香料、果香與令人驚豔的甜度表現。", stats: [4, 3.5, 4.5, 4, 4.5] },
+      { id: "cr6", name: "宏都拉斯 鞏瑪雅瓜 小樹莊園荷西小農日曬倫皮拉", desc: "扎實的口感與明亮的果酸交織，帶有溫和的堅果與巧克力尾韻。", stats: [3.5, 4, 4, 4, 3.5] },
+      { id: "cr7", name: "巴拿馬 波奎特 翡翠莊園 EA1 Gignate San Jose 水洗 藝妓獨立競標批次", desc: "頂級競標批次，無與倫比的茉莉花香、柑橘酸與極致乾淨度。", stats: [5, 4.5, 4.5, 3.5, 5] },
+      { id: "cr8", name: "巴拿馬 瓦肯山谷 聖塔瑪麗亞 吉娜夫人水洗藝妓 BOP#16 競標批次", desc: "BOP獲獎莊園，細緻的花香與豐富的層次感令人回味無窮。", stats: [5, 4.5, 4.5, 3.5, 5] },
+      { id: "cr9", name: "巴拿馬 波奎特 阿爾鐵里莊園瓊比地塊發酵水洗 藝妓 #290225", desc: "特殊發酵水洗手法，在純淨花香中增添了更多的果香層次。", stats: [5, 4, 4.5, 3.5, 4.5] },
+      { id: "cr10", name: "巴西 摩吉安娜皇后莊園日曬黃波旁16目+", desc: "經典的堅果與牛奶巧克力風味，甜感極佳且口感滑順厚實。", stats: [3.5, 2, 4.5, 4.5, 4] },
+      { id: "cr11", name: "巴西 南米納斯瑪朵拉女力計畫 日曬16目+", desc: "柔和的酸度與太妃糖般的甜感，非常適合日常品飲。", stats: [3.5, 2.5, 4.5, 4, 3.5] },
+      { id: "cr12", name: "哥倫比亞 薇拉省小瀑布莊園荷西小農水洗 Bourbon Aruzi", desc: "乾淨明亮的口感，帶有柑橘與核果的香氣，尾韻清甜。", stats: [4, 4, 4, 3.5, 4] },
+      { id: "cr13", name: "哥倫比亞 薇拉省小山丘莊園 古茲曼小農水洗 粉紅波旁", desc: "粉紅波旁特有的甜美櫻桃與覆盆子酸質，乾淨且多汁。", stats: [4, 4.5, 4.5, 3.5, 4] },
+      { id: "cr14", name: "哥倫比亞 薇拉省展望莊園路易斯小農水洗 Catimor", desc: "溫和平衡的風味，帶有淡淡的草本與深焙可可的氣息。", stats: [3.5, 3, 3.5, 4, 3.5] },
+      { id: "cr15", name: "哥倫比亞 薇拉省多彩莊園葉妮芙小農蜜處理 藝妓", desc: "藝妓雅緻的花香與蜜處理的甜感完美結合，餘韻悠長。", stats: [5, 3.5, 4.5, 3.5, 4.5] },
+      { id: "cr16", name: "哥倫比亞 薇拉省棕梠樹莊園 布萊恩小農共同發酵水洗卡杜拉 聖誕美莓", desc: "特殊的共同發酵帶來充滿聖誕節慶氛圍的濃郁莓果香氣。", stats: [4.5, 4, 4.5, 4, 4] },
+      { id: "cr17", name: "哥倫比亞 薇拉省棕梠樹莊園 布萊恩小農共同發酵水洗卡杜拉 藍莓底迪", desc: "猶如藍莓果醬般的強烈甜香，層次豐富且令人驚喜。", stats: [4.5, 3.5, 5, 4, 4] },
+      { id: "cr18", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 莓好時光 水果蜜處理 卡杜拉", desc: "水果蜜處理賦予了豆子鮮明的莓果酸甜滿溢在口中。", stats: [4.5, 4, 4.5, 3.5, 4] },
+      { id: "cr19", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 蜜桃樂園 水果蜜處理 卡杜拉", desc: "奔放的水蜜桃香氣與甜美的果汁感，喝起來輕盈活潑。", stats: [4.5, 4, 4.5, 3.5, 4] },
+      { id: "cr20", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 夏荔風情 水果蜜處理 卡杜拉", desc: "極具特色的荔枝香氣，甜感迷人，尾韻帶有淡淡花香。", stats: [4.5, 3.5, 4.5, 3.5, 4] },
+      { id: "cr21", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 芒裡偷閒 水果蜜處理 卡杜拉", desc: "濃郁的芒果風味與熱帶水果熱情奔放的酸甜，厚實而飽滿。", stats: [4.5, 4, 4.5, 4, 4] },
+      { id: "cr22", name: "衣索比亞 西達馬班莎鎮翰馬修村橘光舞妓水洗慢乾 G1", desc: "水洗慢乾工藝將橘皮的香氣與鮮明的酸質推向極致。", stats: [4.5, 4.5, 4, 3.5, 4] },
+      { id: "cr23", name: "衣索比亞 西達馬班莎鎮翰馬修村 水洗 G1", desc: "經典西達馬水洗風味，明亮的柳橙酸與白花香氣相互輝映。", stats: [4.5, 4, 4, 3.5, 4] },
+      { id: "cr24", name: "衣索比亞 西達馬阿貝果那鎮波淇莎村 水洗 G1", desc: "細緻柔滑的口感，帶有檸檬草與紅茶的清香尾韻。", stats: [4, 4, 4, 3, 4] },
+      { id: "cr25", name: "衣索比亞 蓋德奧耶加雪菲潔蒂普鎮 喬蓓莎村 乾式發酵水洗 G1", desc: "乾式發酵強化了耶加雪菲迷人的柑橘花香與多汁的甜感。", stats: [5, 4.5, 4.5, 3, 4] },
+      { id: "cr26", name: "衣索比亞 蓋德奧耶加雪菲潔蒂普鎮班可果丁丁村乾式發酵水洗 G1", desc: "充滿檸檬皮與水蜜桃風味，香氣悠長且非常純淨。", stats: [4.5, 4, 4.5, 3.5, 4.5] },
+      { id: "cr27", name: "衣索比亞 西達馬班莎鎮薩佳拉黑騎村水洗 G1", desc: "蜂蜜般的甜感與伯爵茶香交織，酸質柔和怡人。", stats: [4.5, 3.5, 4.5, 3.5, 4] },
+      { id: "cr28", name: "衣索比亞 西達馬班莎鎮聖塔維尼村斑鳩處理廠水洗 G1", desc: "明亮奔放的小白花香氣與清脆的青蘋果酸值，乾淨俐落。", stats: [4.5, 4.5, 4, 3, 4] },
+      { id: "cr29", name: "衣索比亞 西達馬班莎鎮康卡納處理廠 橙花雙重厭氧蜜處理 G1", desc: "雙重厭氧賦予了強烈的橙花香氣與複雜多變的水果層次。", stats: [5, 4, 4.5, 4, 4.5] },
+      { id: "cr30", name: "衣索比亞 西達馬班莎鎮康卡納處理廠 荔枝雙重厭氧蜜處理 G1", desc: "狂野的荔枝汁液感，香氣奔放，微帶著迷人的發酵酒香。", stats: [5, 4, 4.5, 4, 4.5] }
+    ]
+  }
+];
+
+let currentChart = null;
+let activeCoffeeId = null; 
+let activeCoffeeObj = null;
+let currentCoffeeStores = [];
+
+// 客座評論的本地儲存機制 (使用 LocalStorage 模擬)
+function getReviews(coffeeId) {
+  const reviewsJson = localStorage.getItem(`coffee_reviews_${coffeeId}`);
+  if (reviewsJson) {
+    return JSON.parse(reviewsJson);
+  } else {
+    // 預設假資料
+    return [
+      { text: "這支豆子真的很有層次，推！", date: "2023-10-01", stats: [5, 4, 4, 3, 5], userAvg: "8" }
+    ];
+  }
+}
+
+function saveReview(coffeeId, text, stats, overallScore) {
+  const reviews = getReviews(coffeeId);
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  
+  const userName = currentUser ? currentUser : '訪客';
+  reviews.push({ user: userName, text: text, date: dateStr, stats: stats, userAvg: overallScore });
+  localStorage.setItem(`coffee_reviews_${coffeeId}`, JSON.stringify(reviews));
+  renderReviews(coffeeId);
+}
+
+function renderReviews(coffeeId) {
+  const reviewsContainer = document.getElementById('reviews-list');
+  reviewsContainer.innerHTML = '';
+  
+  const reviews = getReviews(coffeeId);
+  let dynamicStats = activeCoffeeObj ? activeCoffeeObj.stats.map(s => Math.round(s)) : [5,5,5,5,5];
+  
+  // 計算這支咖啡的平均總分與五感動態變化
+  let topAvgScore = 0;
+  if (reviews.length > 0 && activeCoffeeObj) {
+    const sum = reviews.reduce((acc, r) => acc + parseFloat(r.userAvg || r.avg || 8), 0);
+    topAvgScore = (sum / reviews.length).toFixed(1);
+    document.getElementById('coffee-score').textContent = topAvgScore;
+    
+    // 計算動態五感分數 (基礎分數 + 所有評論星數加總) / (1 + reviews.length)
+    for(let i=0; i<5; i++) {
+        let axisTotal = activeCoffeeObj.stats[i] || 5;
+        let validReviews = 0;
+        for(let r of reviews) {
+            if (r.stats && typeof r.stats[i] === 'number') {
+                axisTotal += r.stats[i];
+                validReviews++;
+            }
+        }
+        dynamicStats[i] = Math.round(axisTotal / (1 + validReviews));
+    }
+    
+  } else if (activeCoffeeObj) {
+    // 沒評論時使用預設五感加總乘以2來當預設 10 分制評分
+    topAvgScore = (activeCoffeeObj.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
+    document.getElementById('coffee-score').textContent = topAvgScore;
+  }
+  
+  // 以動態五感驅動雷達圖
+  if (activeCoffeeObj) {
+     renderRadarChart(activeCoffeeObj.name, dynamicStats);
+  }
+  
+  if (reviews.length === 0) {
+    reviewsContainer.innerHTML = '<div class="review-item" style="color: #666; font-style: italic;">目前還沒有評論，成為第一個留下心得的人吧！</div>';
+  } else {
+    // 最新評論顯示在上方
+    const reversed = [...reviews].reverse();
+    reversed.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'review-item';
+      
+      let scoreHtml = '';
+      if (r.stats) {
+        const labels = ['香氣', '酸度', '甜度', '厚實度', '餘韻'];
+        let gridHtml = '';
+        labels.forEach((L, idx) => {
+            let sVal = Math.round(r.stats[idx] || 0);
+            sVal = Math.max(0, Math.min(5, sVal)); // 限制在 0-5
+            let stars = '★'.repeat(sVal) + '<span style="color:#555;">☆</span>'.repeat(5 - sVal);
+            gridHtml += `<div class="rs-item"><span class="rs-label">${L}</span><span class="rs-val">${stars}</span></div>`;
+        });
+        
+        let scoreToDisplay = r.userAvg || r.avg || '-';
+        scoreHtml = `
+          <div style="margin-bottom: 5px; display:flex; align-items:center;">
+            <strong style="color:var(--accent-gold); font-size: 1.2rem; border: 1px solid var(--accent-gold); padding: 4px 10px; border-radius:4px; margin-right: 15px;">★ ${scoreToDisplay} / 10</strong> 
+          </div>
+          <div class="review-stats-grid">
+             ${gridHtml}
+          </div>
+        `;
+      }
+      
+      const author = r.user ? r.user : '訪客';
+      item.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+          <strong style="color:#fff; font-size:1.1rem; border-left: 3px solid var(--accent-gold); padding-left:8px;">${author}</strong>
+          <span style="color:#888; font-size:0.85rem;">[${r.date}]</span>
+        </div>
+        ${scoreHtml} 
+        <div style="margin-top:15px; font-size:1.05rem; color:#ddd; line-height: 1.6;">${r.text}</div>
+      `;
+      reviewsContainer.appendChild(item);
+    });
+  }
+}
+
+// 初始化 DOM
+document.addEventListener('DOMContentLoaded', () => {
+    
+  // 初始化 Auth UI
+  renderAuth();
+  
+  document.getElementById('btn-login').addEventListener('click', () => {
+    document.getElementById('login-modal').classList.remove('hidden');
+  });
+  
+  const linkLogin = document.getElementById('link-login');
+  if (linkLogin) {
+    linkLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('login-modal').classList.remove('hidden');
+    });
+  }
+  document.getElementById('btn-close-modal').addEventListener('click', () => {
+    document.getElementById('login-modal').classList.add('hidden');
+  });
+  document.getElementById('btn-submit-login').addEventListener('click', () => {
+    const val = document.getElementById('login-username').value.trim();
+    if(val) {
+      currentUser = val;
+      localStorage.setItem('coffee_user', currentUser);
+      renderAuth();
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+  });
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    currentUser = null;
+    localStorage.removeItem('coffee_user');
+    renderAuth();
+  });
+
+  // Logo 回首頁功能
+  const logoBtn = document.querySelector('.logo');
+  if (logoBtn) {
+    logoBtn.addEventListener('click', () => {
+      // 隱藏詳細資訊
+      const detailsCard = document.getElementById('coffee-details');
+      if (detailsCard) detailsCard.classList.add('hidden');
+      
+      // 顯示預設的輪播 / 地圖區塊
+      const placeholder = document.getElementById('placeholder');
+      if (placeholder) placeholder.style.display = 'flex';
+      
+      // 移除左側側邊欄的啟動狀態與搜尋字串
+      document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.value = '';
+        renderCafeList(''); // 重新渲染回不展開的清單
+      }
+      
+      activeCoffeeId = null;
+      activeCoffeeObj = null;
+      
+      // 滾動回最上方（如果頁面有往下滾）
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  const cafeListContainer = document.getElementById('cafe-list');
+  const searchInput = document.getElementById('search-input');
+  
+  // 評論 Modal 開關
+  const btnOpenReviews = document.getElementById('btn-open-reviews');
+  if (btnOpenReviews) {
+    btnOpenReviews.addEventListener('click', () => {
+      document.getElementById('reviews-modal').classList.remove('hidden');
+    });
+  }
+  const btnCloseReviews = document.getElementById('btn-close-reviews');
+  if (btnCloseReviews) {
+    btnCloseReviews.addEventListener('click', () => {
+      document.getElementById('reviews-modal').classList.add('hidden');
+    });
+  }
+  
+  const continentMap = {
+    '非洲': ['衣索比亞', '肯亞', '盧安達', '蒲隆地'],
+    '中南美洲': ['巴拿馬', '哥斯大黎加', '薩爾瓦多', '瓜地馬拉', '宏都拉斯', '巴西', '哥倫比亞', '祕魯', '牙買加'],
+    '亞洲': ['印尼', '台灣', '葉門']
+  };
+
+  function getContinent(country) {
+    for (let continent in continentMap) {
+      if (continentMap[continent].includes(country)) return continent;
+    }
+    return '其他';
+  }
+
+  function renderCafeList(filterText = '') {
+    cafeListContainer.innerHTML = '';
+    const term = filterText.toLowerCase();
+
+    // 將所有豆子打平放入一維陣列，並加上洲與國家的屬性
+    let allCoffees = [];
+    coffeeData.forEach(cafeObj => {
+       cafeObj.coffees.forEach(c => {
+           let country = c.name.split(' ')[0];
+           allCoffees.push({
+               ...c,
+               country: country,
+               continent: getContinent(country),
+               cafeName: cafeObj.cafe,
+               location: cafeObj.location
+           });
+       });
+    });
+
+    const matchedCoffees = allCoffees.filter(c => 
+      c.name.toLowerCase().includes(term) || 
+      c.desc.toLowerCase().includes(term) ||
+      c.cafeName.toLowerCase().includes(term) ||
+      c.country.toLowerCase().includes(term) ||
+      c.continent.toLowerCase().includes(term)
+    );
+
+    // 進行分層群組化
+    const grouped = {};
+    matchedCoffees.forEach(c => {
+      if (!grouped[c.continent]) grouped[c.continent] = {};
+      if (!grouped[c.continent][c.country]) grouped[c.continent][c.country] = [];
+      grouped[c.continent][c.country].push(c);
+    });
+
+    // 依序渲染（設定固定順序）
+    const continentOrder = ['中南美洲', '非洲', '亞洲', '其他'];
+    
+    continentOrder.forEach(continent => {
+      if (grouped[continent]) {
+        // 洲 Header
+        const contDiv = document.createElement('div');
+        contDiv.className = 'continent-section';
+        
+        const contHeader = document.createElement('div');
+        contHeader.className = (term) ? 'continent-header open' : 'continent-header';
+        contHeader.textContent = continent;
+        contDiv.appendChild(contHeader);
+        
+        const contBody = document.createElement('div');
+        contBody.className = (term) ? 'continent-body open' : 'continent-body';
+        contDiv.appendChild(contBody);
+        
+        contHeader.addEventListener('click', () => {
+            contHeader.classList.toggle('open');
+            contBody.classList.toggle('open');
+        });
+
+        const countries = Object.keys(grouped[continent]).sort();
+        countries.forEach(country => {
+          // 國家 Section
+          const countryDiv = document.createElement('div');
+          countryDiv.className = 'country-section';
+          
+          const countryHeader = document.createElement('div');
+          // 當有搜尋條件時預設展開，否則預設收合
+          countryHeader.className = (term) ? 'country-header open' : 'country-header';
+          countryHeader.textContent = country;
+          
+          const countryList = document.createElement('div');
+          countryList.className = (term) ? 'country-list open' : 'country-list';
+          
+          countryHeader.addEventListener('click', () => {
+            countryHeader.classList.toggle('open');
+            countryList.classList.toggle('open');
+          });
+          
+          // 該國家下的各品項豆子
+          grouped[continent][country].forEach(coffee => {
+            const item = document.createElement('div');
+            item.className = 'coffee-item flat-coffee-item hierarchical-item';
+            
+            let displayName = coffee.name;
+            if (term && displayName.toLowerCase().includes(term)) {
+                 const regex = new RegExp(`(${term})`, 'gi');
+                 displayName = displayName.replace(regex, `<span style="color:var(--accent-gold); font-weight:bold;">$1</span>`);
+            }
+
+            item.innerHTML = `
+              <div class="flat-name">${displayName}</div>
+            `;
+
+            item.dataset.id = coffee.id;
+            // 保持選中項的可見性邏輯
+            if (activeCoffeeId === coffee.id) {
+                item.classList.add('active');
+                if (!term) {
+                    contHeader.classList.add('open');
+                    contBody.classList.add('open');
+                    countryHeader.classList.add('open');
+                    countryList.classList.add('open');
+                }
+            }
+            
+            item.addEventListener('click', () => {
+              document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
+              item.classList.add('active');
+              showCoffeeDetails(coffee.cafeName, coffee);
+            });
+            
+            countryList.appendChild(item);
+          });
+          
+          countryDiv.appendChild(countryHeader);
+          countryDiv.appendChild(countryList);
+          contBody.appendChild(countryDiv);
+        });
+        
+        cafeListContainer.appendChild(contDiv);
+      }
+    });
+  }
+
+  // 初始渲染
+  renderCafeList();
+
+  // 綁定搜尋輸入
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      renderCafeList(e.target.value);
+    });
+  }
+
+  // 移除單品下的店家搜尋註冊
+  
+  // 評論表單事件
+  const reviewForm = document.getElementById('review-form');
+  
+  // 總評分(1-10)連動顯示
+  const overallIn = document.getElementById('overall-score-in');
+  const overallVal = document.getElementById('overall-val');
+  if (overallIn && overallVal) {
+    overallIn.addEventListener('input', (e) => {
+      overallVal.textContent = e.target.value;
+    });
+  }
+  
+  // 初始化自訂星星
+  let currentStars = [5, 5, 5, 5, 5];
+  document.querySelectorAll('.stars').forEach(container => {
+    const idx = parseInt(container.dataset.idx);
+    container.innerHTML = '';
+    for(let i=1; i<=5; i++){
+      let s = document.createElement('span');
+      s.textContent = '★';
+      s.className = 'star-icon active';
+      s.dataset.val = i;
+      s.addEventListener('click', () => {
+        currentStars[idx] = i;
+        updateStars(container, i);
+      });
+      container.appendChild(s);
+    }
+  });
+  
+  function updateStars(container, val) {
+    container.querySelectorAll('.star-icon').forEach(s => {
+      if(parseInt(s.dataset.val) <= val) {
+        s.classList.add('active');
+        s.textContent = '★';
+      } else {
+        s.classList.remove('active');
+        s.textContent = '☆';
+      }
+    });
+  }
+
+  reviewForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('review-input');
+    const text = input.value.trim();
+    const overallScore = parseInt(overallIn.value);
+    
+    if (text && activeCoffeeId) {
+      try {
+        // 複製一份陣列儲存
+        saveReview(activeCoffeeId, text, [...currentStars], overallScore);
+        input.value = '';
+        
+        // 重置
+        overallIn.value = 8;
+        if(overallVal) overallVal.textContent = 8;
+        currentStars = [5, 5, 5, 5, 5];
+        document.querySelectorAll('.stars').forEach((container) => {
+          updateStars(container, 5);
+        });
+        
+        // 依照要求跳出視窗
+        alert('已送出!謝謝');
+        // 送出後關閉評論視窗
+        document.getElementById('reviews-modal').classList.add('hidden');
+      } catch(err) {
+        console.error('儲存評論時發生錯誤:', err);
+        const btn = document.querySelector('.btn-submit');
+        if (btn) {
+          const originalText = btn.textContent;
+          btn.textContent = '❌ ' + (err.message || '發生錯誤');
+          btn.style.backgroundColor = '#f44336';
+          btn.style.color = '#fff';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+          }, 4000);
+        } else {
+          alert('發生錯誤：' + err.message);
+        }
+      }
+    }
+  });
+});
+
+function showCoffeeDetails(cafeName, coffee) {
+  activeCoffeeId = coffee.id;
+  activeCoffeeObj = coffee;
+  
+  document.getElementById('placeholder').style.display = 'none';
+  const detailsCard = document.getElementById('coffee-details');
+  detailsCard.classList.remove('hidden');
+  
+  // 強制重新觸發動畫
+  detailsCard.style.animation = 'none';
+  detailsCard.offsetHeight; // trigger reflow
+  detailsCard.style.animation = null; 
+  
+  document.getElementById('coffee-name').textContent = coffee.name;
+  // 移除原來「來自：XXX」
+  
+  const cafesContainer = document.getElementById('coffee-cafes-list');
+  if (cafesContainer) {
+      const baseName = coffee.name.replace(/\(.*\)/g, '').trim();
+      const stores = [];
+      
+      coffeeData.forEach(cafeObj => {
+          const hasIt = cafeObj.coffees.some(c => {
+              const cBase = c.name.replace(/\(.*\)/g, '').trim();
+              return cBase === baseName || cBase.includes(baseName) || baseName.includes(cBase);
+          });
+          if (hasIt) {
+              const label = `${cafeObj.cafe} (${cafeObj.location})`;
+              if (!stores.some(s => s.label === label)) {
+                  stores.push({ cafe: cafeObj.cafe, label: label });
+              }
+          }
+      });
+      
+      currentCoffeeStores = stores;
+      renderCoffeeStores();
+  }
+
+  document.getElementById('coffee-desc').textContent = coffee.desc;
+  
+  // renderReviews 裡會同時處理計算與顯示總平均分與雷達圖重生
+  renderReviews(coffee.id);
+}
+
+function renderRadarChart(coffeeName, stats) {
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  
+  if (currentChart) {
+    currentChart.destroy();
+  }
+  
+  const enLabels = ['Aroma', 'Acidity', 'Sweetness', 'Body', 'Aftertaste'];
+  const chLabels = ['香氣', '酸度', '甜度', '厚度', '餘韻'];
+  
+  const chartLabels = chLabels.map((L, i) => {
+    return `${L} ${enLabels[i]}`;
+  });
+
+  // 圖表改為黑金色調，並且將分數直接在標籤上秀出星星
+  const data = {
+    labels: chartLabels,
+    datasets: [{
+      label: '五感分數 (滿分5星)',
+      data: stats,
+      backgroundColor: 'rgba(207, 169, 104, 0.2)', // gold dim
+      borderColor: 'rgba(207, 169, 104, 1)',      // gold
+      pointBackgroundColor: '#000',
+      pointBorderColor: 'rgba(207, 169, 104, 1)',
+      pointHoverBackgroundColor: 'rgba(207, 169, 104, 1)',
+      pointHoverBorderColor: '#fff',
+      borderWidth: 2,
+    }]
+  };
+  
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: {
+      padding: 10 /* 留白縮小以盡可能放大雷達圖本體 */
+    },
+    scales: {
+      r: {
+        min: 0,
+        max: 5,
+        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+        pointLabels: {
+          color: '#e5c388', /* 回歸多行顯示，微調字體大小與行高 */
+          font: { size: 14, weight: 'bold', family: "'Noto Sans TC', sans-serif" }
+        },
+        ticks: {
+          display: false,
+          stepSize: 1
+        }
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      title: { 
+          display: true, 
+          text: '咖啡五感 Coffee Senses', 
+          color: '#cfa968', 
+          font: { size: 16, family: "'Oswald', 'Noto Sans TC', sans-serif" } 
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        titleFont: { size: 14, family: "'Noto Sans TC', sans-serif" },
+        bodyFont: { size: 14, family: "'Noto Sans TC', sans-serif" },
+        padding: 12,
+        cornerRadius: 0,
+        displayColors: false,
+        borderColor: '#cfa968',
+        borderWidth: 1
+      }
+    }
+  };
+  
+  currentChart = new Chart(ctx, {
+    type: 'radar',
+    data: data,
+    options: options
+  });
+}
+
+const cafeLinks = {
+    "Simple Kaffa 興波咖啡": "https://simplekaffa.com/",
+    "Fika Fika Cafe": "https://www.fikafikacafe.com/",
+    "豆舖咖啡館": "https://www.facebook.com/Doopoocoffee/",
+    "SIDRA 栖爪咖啡": "https://www.instagram.com/sidracoffee/",
+    "ML coffee 慕光咖啡工作室": "https://www.instagram.com/ml_coffee_studio/",
+    "Jo's Corner Café": "https://www.facebook.com/JosCornerCafe/",
+    "著手咖啡 Coffee Intro (中壢內壢店)": "https://www.coffeeintro.com/",
+    "拾事咖啡 SEIZE THE DAY": "https://www.facebook.com/seizethedaycoffee/",
+    "暖空咖啡 Warm air Kafe": "https://www.instagram.com/warmairkafe/",
+    "墨咖啡 Ink Coffee": "https://www.facebook.com/inkcoffee99/",
+    "The Factory Mojocoffee": "https://www.mojocoffee.com.tw/",
+    "著手咖啡 Coffee Intro": "https://www.coffeeintro.com/",
+    "存憶 Cafe Bar": "https://www.facebook.com/tsunyi1932/",
+    "馤咖啡。食作": "https://www.facebook.com/haicoffee2015/",
+    "線上精選": "javascript:void(0);"
+};
+
+function renderCoffeeStores() {
+  const cafesContainer = document.getElementById('coffee-cafes-list');
+  if (!cafesContainer) return;
+
+  if (currentCoffeeStores.length > 0) {
+      cafesContainer.innerHTML = currentCoffeeStores.map(storeObj => {
+          const link = cafeLinks[storeObj.cafe] || `https://www.google.com/search?q=${encodeURIComponent(storeObj.cafe + ' 咖啡')}`;
+          const target = link.startsWith('http') ? 'target="_blank"' : '';
+          return `<a href="${link}" ${target} class="cafe-tag" style="text-decoration:none; display:inline-block; background: rgba(207, 169, 104, 0.1); border: 1px solid var(--accent-gold); padding: 6px 12px; border-radius: 4px; font-size: 0.95rem; margin-right: 5px; margin-bottom: 5px; transition: all 0.2s;">
+              <span style="color: var(--accent-gold); font-weight: bold;">${storeObj.label}</span>
+          </a>`;
+      }).join('');
+  } else {
+      cafesContainer.innerHTML = '<span style="color:#888;">暫無紀錄</span>';
+  }
+}
+
