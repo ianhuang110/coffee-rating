@@ -24,6 +24,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 .hidden {
@@ -696,6 +698,10 @@ body {
   box-shadow: 0 6px 20px rgba(222, 187, 136, 0.3);
 }
 
+.mobile-close-btn {
+  display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {
@@ -705,5 +711,28 @@ body {
   .sidebar {
     flex: none;
     max-height: 300px;
+  }
+  .details-card {
+    position: fixed;
+    top: 5vh;
+    left: 5vw;
+    width: 90vw;
+    height: 90vh; /* max height */
+    z-index: 1500;
+    overflow-y: auto;
+    box-sizing: border-box;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  }
+  .mobile-close-btn {
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: #ccc;
+    font-size: 2.5rem;
+    cursor: pointer;
+    z-index: 10;
   }
 }

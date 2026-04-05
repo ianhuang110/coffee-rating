@@ -388,6 +388,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
+  // 手機版詳細視窗關閉按鈕
+  const btnCloseDetails = document.getElementById('btn-close-details');
+  if (btnCloseDetails) {
+    btnCloseDetails.addEventListener('click', () => {
+      document.getElementById('coffee-details').classList.add('hidden');
+      document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('placeholder').style.display = 'flex';
+      activeCoffeeId = null;
+      activeCoffeeObj = null;
+    });
+  }
+  
   const continentMap = {
     '非洲': ['衣索比亞', '肯亞', '盧安達', '蒲隆地'],
     '中南美洲': ['巴拿馬', '哥斯大黎加', '薩爾瓦多', '瓜地馬拉', '宏都拉斯', '巴西', '哥倫比亞', '祕魯', '牙買加'],
