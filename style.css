@@ -104,6 +104,14 @@ body {
   z-index: 9999 !important;
 }
 
+#reviews-modal {
+  z-index: 10000 !important;
+}
+
+#login-modal {
+  z-index: 10005 !important;
+}
+
 .modal.hidden {
   display: none;
 }
