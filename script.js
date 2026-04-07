@@ -156,43 +156,6 @@ const coffeeData = [
       { id: "k1", name: "盧安達 穆莎莎 (水洗)", desc: "花香、柑橘、紅茶感，整體輕盈乾淨。", stats: [4, 4, 3.5, 2.5, 4] },
       { id: "k2", name: "祕魯 查卡馬 (水洗)", desc: "紅蘋果明亮酸質，焦糖回甘與細緻柔和的口感。", stats: [3.5, 4, 4, 3, 3.5] }
     ]
-  },
-  // 線上精選推薦
-  {
-    cafe: "線上精選",
-    location: "嚴選豆",
-    coffees: [
-      { id: "cr1", name: "哥斯大黎加 塔拉珠聖伊西多羅處理廠蜜處理 藝妓", desc: "蜜處理手法帶來細緻的層次與藝妓特有的優雅花香。", stats: [5, 3.5, 4.5, 3, 4] },
-      { id: "cr2", name: "哥斯大黎加 塔拉珠聖伊西多羅處理廠水洗藝妓", desc: "水洗處理帶來極致純淨的口感，伴隨明亮奔放的白花香氣。", stats: [5, 4, 4, 3, 4.5] },
-      { id: "cr3", name: "哥斯大黎加 布蘭卡奇里波山谷里瓦斯人處理廠 重生莊園黑蜜", desc: "黑蜜處理賦予豆子如糖漿般濃郁的醇厚度與深色莓果風味。", stats: [4, 3, 5, 4.5, 4] },
-      { id: "cr4", name: "宏都拉斯 鞏瑪雅瓜 小樹莊園荷西小農日曬 帕卡瑪拉", desc: "日曬帕卡瑪拉展現奔放的熱帶水果狂野氣息與迷人的酸甜感。", stats: [4.5, 4, 4.5, 4, 4] },
-      { id: "cr5", name: "宏都拉斯 薩卡斯圖梅家族 松林莊園耶爾辛小農日曬 Parainema", desc: "獨特的品種帶來複雜的香料、果香與令人驚豔的甜度表現。", stats: [4, 3.5, 4.5, 4, 4.5] },
-      { id: "cr6", name: "宏都拉斯 鞏瑪雅瓜 小樹莊園荷西小農日曬倫皮拉", desc: "扎實的口感與明亮的果酸交織，帶有溫和的堅果與巧克力尾韻。", stats: [3.5, 4, 4, 4, 3.5] },
-      { id: "cr7", name: "巴拿馬 波奎特 翡翠莊園 EA1 Gignate San Jose 水洗 藝妓獨立競標批次", desc: "頂級競標批次，無與倫比的茉莉花香、柑橘酸與極致乾淨度。", stats: [5, 4.5, 4.5, 3.5, 5] },
-      { id: "cr8", name: "巴拿馬 瓦肯山谷 聖塔瑪麗亞 吉娜夫人水洗藝妓 BOP#16 競標批次", desc: "BOP獲獎莊園，細緻的花香與豐富的層次感令人回味無窮。", stats: [5, 4.5, 4.5, 3.5, 5] },
-      { id: "cr9", name: "巴拿馬 波奎特 阿爾鐵里莊園瓊比地塊發酵水洗 藝妓 #290225", desc: "特殊發酵水洗手法，在純淨花香中增添了更多的果香層次。", stats: [5, 4, 4.5, 3.5, 4.5] },
-      { id: "cr10", name: "巴西 摩吉安娜皇后莊園日曬黃波旁16目+", desc: "經典的堅果與牛奶巧克力風味，甜感極佳且口感滑順厚實。", stats: [3.5, 2, 4.5, 4.5, 4] },
-      { id: "cr11", name: "巴西 南米納斯瑪朵拉女力計畫 日曬16目+", desc: "柔和的酸度與太妃糖般的甜感，非常適合日常品飲。", stats: [3.5, 2.5, 4.5, 4, 3.5] },
-      { id: "cr12", name: "哥倫比亞 薇拉省小瀑布莊園荷西小農水洗 Bourbon Aruzi", desc: "乾淨明亮的口感，帶有柑橘與核果的香氣，尾韻清甜。", stats: [4, 4, 4, 3.5, 4] },
-      { id: "cr13", name: "哥倫比亞 薇拉省小山丘莊園 古茲曼小農水洗 粉紅波旁", desc: "粉紅波旁特有的甜美櫻桃與覆盆子酸質，乾淨且多汁。", stats: [4, 4.5, 4.5, 3.5, 4] },
-      { id: "cr14", name: "哥倫比亞 薇拉省展望莊園路易斯小農水洗 Catimor", desc: "溫和平衡的風味，帶有淡淡的草本與深焙可可的氣息。", stats: [3.5, 3, 3.5, 4, 3.5] },
-      { id: "cr15", name: "哥倫比亞 薇拉省多彩莊園葉妮芙小農蜜處理 藝妓", desc: "藝妓雅緻的花香與蜜處理的甜感完美結合，餘韻悠長。", stats: [5, 3.5, 4.5, 3.5, 4.5] },
-      { id: "cr16", name: "哥倫比亞 薇拉省棕梠樹莊園 布萊恩小農共同發酵水洗卡杜拉 聖誕美莓", desc: "特殊的共同發酵帶來充滿聖誕節慶氛圍的濃郁莓果香氣。", stats: [4.5, 4, 4.5, 4, 4] },
-      { id: "cr17", name: "哥倫比亞 薇拉省棕梠樹莊園 布萊恩小農共同發酵水洗卡杜拉 藍莓底迪", desc: "猶如藍莓果醬般的強烈甜香，層次豐富且令人驚喜。", stats: [4.5, 3.5, 5, 4, 4] },
-      { id: "cr18", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 莓好時光 水果蜜處理 卡杜拉", desc: "水果蜜處理賦予了豆子鮮明的莓果酸甜滿溢在口中。", stats: [4.5, 4, 4.5, 3.5, 4] },
-      { id: "cr19", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 蜜桃樂園 水果蜜處理 卡杜拉", desc: "奔放的水蜜桃香氣與甜美的果汁感，喝起來輕盈活潑。", stats: [4.5, 4, 4.5, 3.5, 4] },
-      { id: "cr20", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 夏荔風情 水果蜜處理 卡杜拉", desc: "極具特色的荔枝香氣，甜感迷人，尾韻帶有淡淡花香。", stats: [4.5, 3.5, 4.5, 3.5, 4] },
-      { id: "cr21", name: "哥倫比亞 安蒂奧基亞省露易莎莊園 芒裡偷閒 水果蜜處理 卡杜拉", desc: "濃郁的芒果風味與熱帶水果熱情奔放的酸甜，厚實而飽滿。", stats: [4.5, 4, 4.5, 4, 4] },
-      { id: "cr22", name: "衣索比亞 西達馬班莎鎮翰馬修村橘光舞妓水洗慢乾 G1", desc: "水洗慢乾工藝將橘皮的香氣與鮮明的酸質推向極致。", stats: [4.5, 4.5, 4, 3.5, 4] },
-      { id: "cr23", name: "衣索比亞 西達馬班莎鎮翰馬修村 水洗 G1", desc: "經典西達馬水洗風味，明亮的柳橙酸與白花香氣相互輝映。", stats: [4.5, 4, 4, 3.5, 4] },
-      { id: "cr24", name: "衣索比亞 西達馬阿貝果那鎮波淇莎村 水洗 G1", desc: "細緻柔滑的口感，帶有檸檬草與紅茶的清香尾韻。", stats: [4, 4, 4, 3, 4] },
-      { id: "cr25", name: "衣索比亞 蓋德奧耶加雪菲潔蒂普鎮 喬蓓莎村 乾式發酵水洗 G1", desc: "乾式發酵強化了耶加雪菲迷人的柑橘花香與多汁的甜感。", stats: [5, 4.5, 4.5, 3, 4] },
-      { id: "cr26", name: "衣索比亞 蓋德奧耶加雪菲潔蒂普鎮班可果丁丁村乾式發酵水洗 G1", desc: "充滿檸檬皮與水蜜桃風味，香氣悠長且非常純淨。", stats: [4.5, 4, 4.5, 3.5, 4.5] },
-      { id: "cr27", name: "衣索比亞 西達馬班莎鎮薩佳拉黑騎村水洗 G1", desc: "蜂蜜般的甜感與伯爵茶香交織，酸質柔和怡人。", stats: [4.5, 3.5, 4.5, 3.5, 4] },
-      { id: "cr28", name: "衣索比亞 西達馬班莎鎮聖塔維尼村斑鳩處理廠水洗 G1", desc: "明亮奔放的小白花香氣與清脆的青蘋果酸值，乾淨俐落。", stats: [4.5, 4.5, 4, 3, 4] },
-      { id: "cr29", name: "衣索比亞 西達馬班莎鎮康卡納處理廠 橙花雙重厭氧蜜處理 G1", desc: "雙重厭氧賦予了強烈的橙花香氣與複雜多變的水果層次。", stats: [5, 4, 4.5, 4, 4.5] },
-      { id: "cr30", name: "衣索比亞 西達馬班莎鎮康卡納處理廠 荔枝雙重厭氧蜜處理 G1", desc: "狂野的荔枝汁液感，香氣奔放，微帶著迷人的發酵酒香。", stats: [5, 4, 4.5, 4, 4.5] }
-    ]
   }
 ];
 
@@ -200,6 +163,87 @@ let currentChart = null;
 let activeCoffeeId = null; 
 let activeCoffeeObj = null;
 let currentCoffeeStores = [];
+
+// 模擬實體咖啡廳經緯度
+const cafeCoordinates = {
+  "Simple Kaffa 興波咖啡": [25.0441, 121.5303],
+  "Fika Fika Cafe": [25.0531, 121.5350],
+  "豆舖咖啡館": [24.9930, 121.3000],
+  "SIDRA 栖爪咖啡": [24.9600, 121.2250],
+  "ML coffee 慕光咖啡工作室": [24.9530, 121.2290],
+  "Jo's Corner Café": [25.0000, 121.2950],
+  "著手咖啡 Coffee Intro (中壢內壢店)": [24.9750, 121.2600],
+  "拾事咖啡 SEIZE THE DAY": [24.9680, 121.2400],
+  "暖空咖啡 Warm air Kafe": [24.9580, 121.2100],
+  "墨咖啡 Ink Coffee": [24.8050, 120.9700],
+  "The Factory Mojocoffee": [24.1500, 120.6650],
+  "著手咖啡 Coffee Intro": [24.1550, 120.6600],
+  "存憶 Cafe Bar": [22.9980, 120.2000],
+  "馤咖啡。食作": [22.6250, 120.3100]
+};
+
+let map;
+let markers = {};
+
+// 初始化 Leaflet 地圖
+function initMap() {
+    map = L.map('map', {
+        zoomControl: false 
+    }).setView([23.6, 120.9], 8); // 台灣中心聚焦
+
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(map);
+
+    // 極簡乾淨道路地圖 (具備完美繁體中文)
+    L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW', {
+        attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
+        maxZoom: 20
+    }).addTo(map);
+
+    // 新增標記
+    coffeeData.forEach(cafeObj => {
+        if (cafeCoordinates[cafeObj.cafe]) {
+            const coords = cafeCoordinates[cafeObj.cafe];
+            const marker = L.circleMarker(coords, {
+                color: '#8b5a2b', // 改為較深木質色以在白底明顯
+                fillColor: '#8b5a2b',
+                fillOpacity: 0.8,
+                radius: 8,
+                weight: 2
+            }).addTo(map);
+            
+            marker.bindPopup(`<b>${cafeObj.cafe}</b><br><span style="color:#666">${cafeObj.location}</span>`);
+            
+            marker.on('mouseover', function (e) {
+                this.openPopup();
+            });
+            
+            marker.on('mouseout', function (e) {
+                this.closePopup();
+            });
+
+            // 點擊地標：搜尋側邊欄
+            marker.on('click', () => {
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = cafeObj.cafe;
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+                
+                const detailsCard = document.getElementById('coffee-details');
+                if (detailsCard) detailsCard.classList.add('hidden');
+                
+                map.setView(coords, 14, { animate: true, duration: 1 });
+            });
+            
+            markers[cafeObj.cafe] = {
+                marker: marker,
+                coords: coords
+            };
+        }
+    });
+}
 
 // 客座評論的本地儲存機制 (使用 LocalStorage 模擬)
 function getReviews(coffeeId) {
@@ -313,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
   // 初始化 Auth UI
   renderAuth();
+  initMap();
   
   document.getElementById('btn-login').addEventListener('click', () => {
     document.getElementById('login-modal').classList.remove('hidden');
@@ -351,9 +396,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const detailsCard = document.getElementById('coffee-details');
       if (detailsCard) detailsCard.classList.add('hidden');
       
-      // 顯示預設的輪播 / 地圖區塊
-      const placeholder = document.getElementById('placeholder');
-      if (placeholder) placeholder.style.display = 'flex';
+      // 不再操作改名已移除的 placeholder
+      
+      // 回復地圖全螢幕視角與所有標記
+      if (map) {
+          Object.values(markers).forEach(m => m.marker.addTo(map).closePopup());
+          map.setView([23.6, 120.9], 8, { animate: true, duration: 1 });
+      }
       
       // 移除左側側邊欄的啟動狀態與搜尋字串
       document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
@@ -393,8 +442,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCloseDetails) {
     btnCloseDetails.addEventListener('click', () => {
       document.getElementById('coffee-details').classList.add('hidden');
-      document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
-      document.getElementById('placeholder').style.display = 'flex';
+      
+      if (map) {
+          Object.values(markers).forEach(m => m.marker.addTo(map).closePopup());
+          map.setView([23.6, 120.9], 8, { animate: true, duration: 1 });
+      }
       activeCoffeeId = null;
       activeCoffeeObj = null;
     });
@@ -521,6 +573,8 @@ document.addEventListener('DOMContentLoaded', () => {
               document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
               item.classList.add('active');
               showCoffeeDetails(coffee.cafeName, coffee);
+              
+              // 不再單純平移，這裡已經觸發了 showCoffeeDetails，由那邊負責篩選與縮放。
             });
             
             countryList.appendChild(item);
@@ -639,7 +693,11 @@ function showCoffeeDetails(cafeName, coffee) {
   activeCoffeeId = coffee.id;
   activeCoffeeObj = coffee;
   
-  document.getElementById('placeholder').style.display = 'none';
+  // 確保畫面維持在最上方（防止外層捲軸意外產生時地圖跑版）
+  if (window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   const detailsCard = document.getElementById('coffee-details');
   detailsCard.classList.remove('hidden');
   
@@ -671,6 +729,31 @@ function showCoffeeDetails(cafeName, coffee) {
       
       currentCoffeeStores = stores;
       renderCoffeeStores();
+      
+      // 更新地圖標記：只顯示有賣這個基底豆的店家
+      if (map) {
+          let bounds = L.latLngBounds();
+          let foundMarkers = [];
+          
+          Object.values(markers).forEach(m => m.marker.remove()); // 先移除全部
+          
+          stores.forEach(s => {
+              if (markers[s.cafe]) {
+                  markers[s.cafe].marker.addTo(map);
+                  markers[s.cafe].marker.openPopup();
+                  bounds.extend(markers[s.cafe].coords);
+                  foundMarkers.push(markers[s.cafe]);
+              }
+          });
+          
+          if (foundMarkers.length > 0) {
+              if (foundMarkers.length === 1) {
+                  map.setView(foundMarkers[0].coords, 14, {animate: true, duration: 1});
+              } else {
+                  map.fitBounds(bounds, { padding: [50, 50], animate: true, duration: 1, maxZoom: 14 });
+              }
+          }
+      }
   }
 
   document.getElementById('coffee-desc').textContent = coffee.desc;
@@ -773,8 +856,7 @@ const cafeLinks = {
     "The Factory Mojocoffee": "https://www.mojocoffee.com.tw/",
     "著手咖啡 Coffee Intro": "https://www.coffeeintro.com/",
     "存憶 Cafe Bar": "https://www.facebook.com/tsunyi1932/",
-    "馤咖啡。食作": "https://www.facebook.com/haicoffee2015/",
-    "線上精選": "javascript:void(0);"
+    "馤咖啡。食作": "https://www.facebook.com/haicoffee2015/"
 };
 
 function renderCoffeeStores() {
@@ -792,5 +874,18 @@ function renderCoffeeStores() {
   } else {
       cafesContainer.innerHTML = '<span style="color:#888;">暫無紀錄</span>';
   }
+}
+
+// 註冊 Service Worker (PWA支援)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('ServiceWorker 註冊成功，範圍為: ', registration.scope);
+      })
+      .catch(err => {
+        console.log('ServiceWorker 註冊失敗: ', err);
+      });
+  });
 }
 
