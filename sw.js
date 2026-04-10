@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffee-rating-v1';
+const CACHE_NAME = 'coffee-rating-v4';
 const urlsToCache = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting(); // 強制立即接管
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -31,6 +32,7 @@ self.addEventListener('fetch', event => {
 });
 
 self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim()); // 啟用後立即對當前頁面生效
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {

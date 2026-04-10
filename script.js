@@ -184,19 +184,20 @@ const cafeCoordinates = {
 
 let map;
 let markers = {};
+let mapBounds = L.latLngBounds();
 
 // 初始化 Leaflet 地圖
 function initMap() {
     map = L.map('map', {
         zoomControl: false 
-    }).setView([23.6, 120.9], 8); // 台灣中心聚焦
+    }); // 移除預設 setView，改為稍後依據 markers 動態定位
 
     L.control.zoom({
         position: 'bottomright'
     }).addTo(map);
 
-    // 極簡乾淨道路地圖 (具備完美繁體中文)
-    L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW', {
+    // 極簡乾淨道路地圖 (具備完美繁體中文)，增加 scale=2 與 tileSize 優化 Retina 高畫質顯示
+    L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW&scale=2', {
         attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
         maxZoom: 20
     }).addTo(map);
@@ -205,16 +206,19 @@ function initMap() {
     coffeeData.forEach(cafeObj => {
         if (cafeCoordinates[cafeObj.cafe]) {
             const coords = cafeCoordinates[cafeObj.cafe];
+            mapBounds.extend(coords);
+            
             const marker = L.circleMarker(coords, {
-                color: '#8b5a2b', // 改為較深木質色以在白底明顯
-                fillColor: '#8b5a2b',
-                fillOpacity: 0.8,
-                radius: 8,
-                weight: 2
+                color: '#ffffff', // 白色外框讓目標更明顯
+                fillColor: '#e74c3c', // 改為鮮豔的紅色
+                fillOpacity: 0.9,
+                radius: 10,
+                weight: 3
             }).addTo(map);
             
             marker.bindPopup(`<b>${cafeObj.cafe}</b><br><span style="color:#666">${cafeObj.location}</span>`);
             
+            // 滑鼠移過去就顯示提示圖片
             marker.on('mouseover', function (e) {
                 this.openPopup();
             });
@@ -243,6 +247,11 @@ function initMap() {
             };
         }
     });
+
+    // 初始化時將地圖縮放至包含所有標記的範圍
+    if (mapBounds.isValid()) {
+        map.fitBounds(mapBounds, { padding: [50, 50] });
+    }
 }
 
 // 客座評論的本地儲存機制 (使用 LocalStorage 模擬)
@@ -401,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 回復地圖全螢幕視角與所有標記
       if (map) {
           Object.values(markers).forEach(m => m.marker.addTo(map).closePopup());
-          map.setView([23.6, 120.9], 8, { animate: true, duration: 1 });
+          map.fitBounds(mapBounds, { padding: [50, 50], animate: true, duration: 1 });
       }
       
       // 移除左側側邊欄的啟動狀態與搜尋字串
@@ -445,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (map) {
           Object.values(markers).forEach(m => m.marker.addTo(map).closePopup());
-          map.setView([23.6, 120.9], 8, { animate: true, duration: 1 });
+          map.fitBounds(mapBounds, { padding: [50, 50], animate: true, duration: 1 });
       }
       activeCoffeeId = null;
       activeCoffeeObj = null;

@@ -748,3 +748,18 @@ body {
     z-index: 10;
   }
 }
+
+/* 地圖常駐標籤 */
+.leaflet-tooltip.cafe-map-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-shadow: 1px 1px 3px #000, -1px -1px 3px #000, 1px -1px 3px #000, -1px 1px 3px #000;
+  pointer-events: none;
+}
+.leaflet-tooltip.cafe-map-label::before {
+  display: none !important; /* 隱藏 tooltip 的箭頭 */
+}
