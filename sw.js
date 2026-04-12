@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffee-rating-v5';
+const CACHE_NAME = 'coffee-rating-v6';
 const urlsToCache = [
   './',
   './index.html',
