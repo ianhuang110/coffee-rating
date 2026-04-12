@@ -169,95 +169,7 @@ let activeCoffeeId = null;
 let activeCoffeeObj = null;
 let currentCoffeeStores = [];
 
-// 模擬實體咖啡廳經緯度
-const cafeCoordinates = {
-  "Simple Kaffa 興波咖啡": [25.0441, 121.5303],
-  "Fika Fika Cafe": [25.0531, 121.5350],
-  "豆舖咖啡館": [24.9930, 121.3000],
-  "SIDRA 栖爪咖啡": [24.9600, 121.2250],
-  "ML coffee 慕光咖啡工作室": [24.9530, 121.2290],
-  "Jo's Corner Café": [25.0000, 121.2950],
-  "著手咖啡 Coffee Intro (中壢內壢店)": [24.9750, 121.2600],
-  "拾事咖啡 SEIZE THE DAY": [24.9680, 121.2400],
-  "暖空咖啡 Warm air Kafe": [24.9580, 121.2100],
-  "墨咖啡 Ink Coffee": [24.8050, 120.9700],
-  "The Factory Mojocoffee": [24.1500, 120.6650],
-  "著手咖啡 Coffee Intro": [24.1550, 120.6600],
-  "存憶 Cafe Bar": [22.9980, 120.2000],
-  "馤咖啡。食作": [22.6250, 120.3100]
-};
-
-let map;
-let markers = {};
-let mapBounds = L.latLngBounds();
-
-// 初始化 Leaflet 地圖
-function initMap() {
-    map = L.map('map', {
-        zoomControl: false 
-    }); // 移除預設 setView，改為稍後依據 markers 動態定位
-
-    L.control.zoom({
-        position: 'bottomright'
-    }).addTo(map);
-
-    // 極簡乾淨道路地圖 (具備完美繁體中文)，增加 scale=2 與 tileSize 優化 Retina 高畫質顯示
-    L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW&scale=2', {
-        attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
-        maxZoom: 20
-    }).addTo(map);
-
-    // 新增標記
-    coffeeData.forEach(cafeObj => {
-        if (cafeCoordinates[cafeObj.cafe]) {
-            const coords = cafeCoordinates[cafeObj.cafe];
-            mapBounds.extend(coords);
-            
-            const marker = L.circleMarker(coords, {
-                color: '#ffffff', // 白色外框讓目標更明顯
-                fillColor: '#e74c3c', // 改為鮮豔的紅色
-                fillOpacity: 0.9,
-                radius: 10,
-                weight: 3
-            }).addTo(map);
-            
-            marker.bindPopup(`<b>${cafeObj.cafe}</b><br><span style="color:#666">${cafeObj.location}</span>`);
-            
-            // 滑鼠移過去就顯示提示圖片
-            marker.on('mouseover', function (e) {
-                this.openPopup();
-            });
-            
-            marker.on('mouseout', function (e) {
-                this.closePopup();
-            });
-
-            // 點擊地標：搜尋側邊欄
-            marker.on('click', () => {
-                const searchInput = document.getElementById('search-input');
-                if (searchInput) {
-                    searchInput.value = cafeObj.cafe;
-                    searchInput.dispatchEvent(new Event('input'));
-                }
-                
-                const detailsCard = document.getElementById('coffee-details');
-                if (detailsCard) detailsCard.classList.add('hidden');
-                
-                map.setView(coords, 14, { animate: true, duration: 1 });
-            });
-            
-            markers[cafeObj.cafe] = {
-                marker: marker,
-                coords: coords
-            };
-        }
-    });
-
-    // 初始化時將地圖縮放至包含所有標記的範圍
-    if (mapBounds.isValid()) {
-        map.fitBounds(mapBounds, { padding: [50, 50] });
-    }
-}
+// 原本地圖的地標變數可保留，若不需要也可刪除。這裡我們暫停使用。
 
 // 客座評論的本地儲存機制 (使用 LocalStorage 模擬)
 function getReviews(coffeeId) {
@@ -355,11 +267,11 @@ function renderReviews(coffeeId) {
       const author = r.user ? r.user : '訪客';
       item.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-          <strong style="color:#fff; font-size:1.1rem; border-left: 3px solid var(--accent-gold); padding-left:8px;">${author}</strong>
+          <strong style="color:#333; font-size:1.1rem; border-left: 3px solid var(--accent-gold); padding-left:8px;">${author}</strong>
           <span style="color:#888; font-size:0.85rem;">[${r.date}]</span>
         </div>
         ${scoreHtml} 
-        <div style="margin-top:15px; font-size:1.05rem; color:#ddd; line-height: 1.6;">${r.text}</div>
+        <div style="margin-top:15px; font-size:1.05rem; color:#555; line-height: 1.6;">${r.text}</div>
       `;
       reviewsContainer.appendChild(item);
     });
@@ -371,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
   // 初始化 Auth UI
   renderAuth();
-  initMap();
   
   document.getElementById('btn-login').addEventListener('click', () => {
     document.getElementById('login-modal').classList.remove('hidden');
@@ -534,12 +445,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // 不再操作改名已移除的 placeholder
       
       // 回復地圖全螢幕視角與所有標記
-      if (map) {
-          Object.values(markers).forEach(m => m.marker.addTo(map).closePopup());
-          map.fitBounds(mapBounds, { padding: [50, 50], animate: true, duration: 1 });
-      }
       
-      // 移除左側側邊欄的啟動狀態與搜尋字串
+      // 回復為空白狀態
+      const placeholder = document.getElementById('welcome-placeholder');
+      if (placeholder) placeholder.classList.remove('hidden');
       document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
       const searchInput = document.getElementById('search-input');
       if (searchInput) {
@@ -578,10 +487,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCloseDetails.addEventListener('click', () => {
       document.getElementById('coffee-details').classList.add('hidden');
       
-      if (map) {
-          Object.values(markers).forEach(m => m.marker.addTo(map).closePopup());
-          map.fitBounds(mapBounds, { padding: [50, 50], animate: true, duration: 1 });
-      }
+      const placeholder = document.getElementById('welcome-placeholder');
+      if (placeholder) placeholder.classList.remove('hidden');
+      
       activeCoffeeId = null;
       activeCoffeeObj = null;
     });
@@ -836,6 +744,9 @@ function showCoffeeDetails(cafeName, coffee) {
   const detailsCard = document.getElementById('coffee-details');
   detailsCard.classList.remove('hidden');
   
+  const placeholder = document.getElementById('welcome-placeholder');
+  if (placeholder) placeholder.classList.add('hidden');
+  
   // 強制重新觸發動畫
   detailsCard.style.animation = 'none';
   detailsCard.offsetHeight; // trigger reflow
@@ -864,31 +775,6 @@ function showCoffeeDetails(cafeName, coffee) {
       
       currentCoffeeStores = stores;
       renderCoffeeStores();
-      
-      // 更新地圖標記：只顯示有賣這個基底豆的店家
-      if (map) {
-          let bounds = L.latLngBounds();
-          let foundMarkers = [];
-          
-          Object.values(markers).forEach(m => m.marker.remove()); // 先移除全部
-          
-          stores.forEach(s => {
-              if (markers[s.cafe]) {
-                  markers[s.cafe].marker.addTo(map);
-                  markers[s.cafe].marker.openPopup();
-                  bounds.extend(markers[s.cafe].coords);
-                  foundMarkers.push(markers[s.cafe]);
-              }
-          });
-          
-          if (foundMarkers.length > 0) {
-              if (foundMarkers.length === 1) {
-                  map.setView(foundMarkers[0].coords, 14, {animate: true, duration: 1});
-              } else {
-                  map.fitBounds(bounds, { padding: [50, 50], animate: true, duration: 1, maxZoom: 14 });
-              }
-          }
-      }
   }
 
   document.getElementById('coffee-desc').textContent = coffee.desc;
@@ -917,12 +803,12 @@ function renderRadarChart(coffeeName, stats) {
     datasets: [{
       label: '五感分數 (滿分5星)',
       data: stats,
-      backgroundColor: 'rgba(207, 169, 104, 0.2)', // gold dim
-      borderColor: 'rgba(207, 169, 104, 1)',      // gold
-      pointBackgroundColor: '#000',
-      pointBorderColor: 'rgba(207, 169, 104, 1)',
-      pointHoverBackgroundColor: 'rgba(207, 169, 104, 1)',
-      pointHoverBorderColor: '#fff',
+      backgroundColor: 'rgba(205, 162, 91, 0.15)', // lighter gold dim
+      borderColor: 'rgba(205, 162, 91, 1)',      // gold
+      pointBackgroundColor: '#fff',
+      pointBorderColor: 'rgba(205, 162, 91, 1)',
+      pointHoverBackgroundColor: 'rgba(205, 162, 91, 1)',
+      pointHoverBorderColor: '#333',
       borderWidth: 2,
     }]
   };
@@ -937,10 +823,10 @@ function renderRadarChart(coffeeName, stats) {
       r: {
         min: 0,
         max: 5,
-        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+        grid: { color: 'rgba(0, 0, 0, 0.1)' },
         pointLabels: {
-          color: '#e5c388', /* 回歸多行顯示，微調字體大小與行高 */
+          color: '#b88d4c', /* 回歸多行顯示，微調字體大小與行高 */
           font: { size: 14, weight: 'bold', family: "'Noto Sans TC', sans-serif" }
         },
         ticks: {
@@ -954,17 +840,19 @@ function renderRadarChart(coffeeName, stats) {
       title: { 
           display: true, 
           text: '咖啡五感 Coffee Senses', 
-          color: '#cfa968', 
+          color: '#cda25b', 
           font: { size: 16, family: "'Oswald', 'Noto Sans TC', sans-serif" } 
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        titleColor: '#333',
+        bodyColor: '#555',
         titleFont: { size: 14, family: "'Noto Sans TC', sans-serif" },
         bodyFont: { size: 14, family: "'Noto Sans TC', sans-serif" },
         padding: 12,
         cornerRadius: 0,
         displayColors: false,
-        borderColor: '#cfa968',
+        borderColor: '#cda25b',
         borderWidth: 1
       }
     }
