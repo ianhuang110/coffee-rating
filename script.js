@@ -408,6 +408,34 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('請輸入 Email 及密碼');
     }
   });
+  const linkForgotPwd = document.getElementById('link-forgot-password');
+  if (linkForgotPwd) {
+    linkForgotPwd.addEventListener('click', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      if (!email) {
+        alert('請先在上方輸入您的 Email，然後再點擊忘記密碼！');
+        return;
+      }
+      if (!usersDB[email]) {
+        alert('找不到此 Email 的註冊紀錄，請先註冊會員！');
+        return;
+      }
+
+      const randomPwd = Math.random().toString(36).substring(2, 8);
+      const userRecord = usersDB[email];
+      if (typeof userRecord === 'object') {
+        userRecord.password = randomPwd;
+      } else {
+        usersDB[email] = randomPwd; 
+      }
+      localStorage.setItem('coffee_users_db', JSON.stringify(usersDB));
+      
+      alert(`【系統模擬】密碼重置成功，新密碼已發送至 ${email}！\n\n您的新密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請務必自行修改密碼。`);
+      document.getElementById('login-password').value = randomPwd;
+    });
+  }
+
 
   const linkOpenRegister = document.getElementById('link-open-register');
   if (linkOpenRegister) {
