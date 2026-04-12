@@ -358,7 +358,10 @@ body {
 /* 真人手沖預設畫面圖片 */
 .hero-img-box {
   width: 360px;
+  max-width: 75vw;
   height: 360px;
+  max-height: 75vw;
+  aspect-ratio: 1 / 1;
   margin-bottom: 30px;
   border-radius: 50%;
   overflow: hidden;
@@ -858,6 +861,10 @@ body {
     font-size: 2.5rem;
     cursor: pointer;
     z-index: 10;
+  }
+  .hero-img-box {
+    border-width: 3px;
+    margin-bottom: 15px;
   }
 }
 
