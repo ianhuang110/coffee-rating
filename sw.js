@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffee-rating-v4';
+const CACHE_NAME = 'coffee-rating-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -19,14 +19,17 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // 改為 Network-First (網路優先) 策略，確保每次都抓最新檔案，失敗時才讀取快取
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        // Cache hit - return response
-        if (response) {
+        return caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, response.clone());
           return response;
-        }
-        return fetch(event.request);
+        });
+      })
+      .catch(() => {
+        return caches.match(event.request);
       })
   );
 });

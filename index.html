@@ -20,6 +20,7 @@
         <div class="auth-section">
             <span id="user-display"></span>
             <button id="btn-login" class="btn-outline">會員登入</button>
+            <button id="btn-change-password" class="btn-outline hidden">更改密碼</button>
             <button id="btn-logout" class="btn-outline hidden">登出</button>
         </div>
     </nav>
@@ -31,12 +32,58 @@
             <h3 style="color:var(--accent-gold); margin-top:0;">會員登入</h3>
             <div style="margin-bottom: 1.5rem;">
                 <label
-                    style="display:block; color:#aaa; margin-bottom:0.8rem; font-size:0.9rem;">想以什麼身份留言？(請輸入暱稱)</label>
-                <input type="text" id="login-username" class="login-input" placeholder="例如：尋豆達人">
+                    style="display:block; color:#aaa; margin-bottom:0.8rem; font-size:0.9rem;">Email</label>
+                <input type="email" id="login-email" class="login-input" placeholder="請輸入 Email">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label
+                    style="display:block; color:#aaa; margin-bottom:0.8rem; font-size:0.9rem;">登入密碼</label>
+                <input type="password" id="login-password" class="login-input" placeholder="請輸入密碼">
             </div>
             <div style="display:flex; gap:10px; justify-content:flex-end;">
                 <button id="btn-close-modal" class="btn-outline">取消</button>
                 <button id="btn-submit-login" class="btn-submit">登入</button>
+            </div>
+            <p style="text-align:right; font-size:0.85rem; margin-top:15px;">
+                <a href="#" id="link-open-register" style="color:var(--accent-gold); text-decoration:none;">還不是會員？點此註冊</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- 更改密碼 Modal -->
+    <div id="password-modal" class="modal hidden" style="z-index: 2020;">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-gold); margin-top:0;">更改密碼</h3>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; color:#aaa; margin-bottom:0.8rem; font-size:0.9rem;">輸入新密碼</label>
+                <input type="password" id="new-password" class="login-input" placeholder="請輸入新密碼">
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="btn-close-pwd-modal" class="btn-outline">取消</button>
+                <button id="btn-submit-pwd" class="btn-submit">確認更改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 註冊會員 Modal -->
+    <div id="register-modal" class="modal hidden" style="z-index: 2025;">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-gold); margin-top:0;">註冊會員</h3>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; color:#aaa; margin-bottom:0.8rem; font-size:0.9rem;">姓名 (必填)</label>
+                <input type="text" id="reg-name" class="login-input" placeholder="請輸入姓名">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; color:#aaa; margin-bottom:0.8rem; font-size:0.9rem;">電話 (必填)</label>
+                <input type="tel" id="reg-phone" class="login-input" placeholder="請輸入電話號碼">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; color:#aaa; margin-bottom:0.8rem; font-size:0.9rem;">Email (必填)</label>
+                <input type="email" id="reg-email" class="login-input" placeholder="請輸入 Email">
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="btn-close-reg-modal" class="btn-outline">取消</button>
+                <button id="btn-submit-reg" class="btn-submit">註冊並發送密碼</button>
             </div>
         </div>
     </div>

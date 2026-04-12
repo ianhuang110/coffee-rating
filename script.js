@@ -1,10 +1,13 @@
 // 會員系統模擬
 let currentUser = localStorage.getItem('coffee_user') || null;
+let currentEmail = localStorage.getItem('coffee_email') || null;
+let usersDB = JSON.parse(localStorage.getItem('coffee_users_db') || '{}');
 
 function renderAuth() {
   const disp = document.getElementById('user-display');
   const btnLogin = document.getElementById('btn-login');
   const btnLogout = document.getElementById('btn-logout');
+  const btnChangePwd = document.getElementById('btn-change-password');
   const reviewForm = document.getElementById('review-form');
   const loginPrompt = document.getElementById('login-prompt');
   
@@ -12,12 +15,14 @@ function renderAuth() {
     disp.textContent = `歡迎，${currentUser}`;
     btnLogin.classList.add('hidden');
     btnLogout.classList.remove('hidden');
+    if (btnChangePwd) btnChangePwd.classList.remove('hidden');
     if (reviewForm) reviewForm.style.display = 'flex';
     if (loginPrompt) loginPrompt.style.display = 'none';
   } else {
     disp.textContent = '';
     btnLogin.classList.remove('hidden');
     btnLogout.classList.add('hidden');
+    if (btnChangePwd) btnChangePwd.classList.add('hidden');
     if (reviewForm) reviewForm.style.display = 'none';
     if (loginPrompt) loginPrompt.style.display = 'block';
   }
@@ -383,17 +388,110 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-modal').classList.add('hidden');
   });
   document.getElementById('btn-submit-login').addEventListener('click', () => {
-    const val = document.getElementById('login-username').value.trim();
-    if(val) {
-      currentUser = val;
-      localStorage.setItem('coffee_user', currentUser);
-      renderAuth();
-      document.getElementById('login-modal').classList.add('hidden');
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if(email && password) {
+      const userRecord = usersDB[email];
+      const validPwd = (typeof userRecord === 'string') ? userRecord : (userRecord ? userRecord.password : null);
+      
+      if (validPwd && validPwd === password) {
+        currentUser = (typeof userRecord === 'object' && userRecord.name) ? userRecord.name : email.split('@')[0];
+        currentEmail = email;
+        localStorage.setItem('coffee_user', currentUser);
+        localStorage.setItem('coffee_email', currentEmail);
+        renderAuth();
+        document.getElementById('login-modal').classList.add('hidden');
+      } else {
+        alert('Email 或密碼錯誤！（若還不是會員，請點選註冊）');
+      }
+    } else {
+      alert('請輸入 Email 及密碼');
     }
   });
+
+  const linkOpenRegister = document.getElementById('link-open-register');
+  if (linkOpenRegister) {
+    linkOpenRegister.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('login-modal').classList.add('hidden');
+      document.getElementById('register-modal').classList.remove('hidden');
+    });
+  }
+
+  const btnCloseRegModal = document.getElementById('btn-close-reg-modal');
+  if (btnCloseRegModal) {
+    btnCloseRegModal.addEventListener('click', () => {
+      document.getElementById('register-modal').classList.add('hidden');
+    });
+  }
+
+  const btnSubmitReg = document.getElementById('btn-submit-reg');
+  if (btnSubmitReg) {
+    btnSubmitReg.addEventListener('click', () => {
+      const name = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+
+      if (!name || !phone || !email) {
+        alert('請填寫完整姓名、電話與 Email！');
+        return;
+      }
+      if (usersDB[email]) {
+        alert('此 Email 已經註冊過囉，請直接使用密碼登入！');
+        document.getElementById('register-modal').classList.add('hidden');
+        document.getElementById('login-modal').classList.remove('hidden');
+        document.getElementById('login-email').value = email;
+        return;
+      }
+
+      const randomPwd = Math.random().toString(36).substring(2, 8);
+      usersDB[email] = { name, phone, password: randomPwd };
+      localStorage.setItem('coffee_users_db', JSON.stringify(usersDB));
+      alert(`【系統模擬】註冊成功，密碼已發送至 ${email}！\n\n您的初始密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請自行修改密碼。`);
+      
+      // 自動切換到登入 modal 並帶入參數
+      document.getElementById('register-modal').classList.add('hidden');
+      document.getElementById('login-modal').classList.remove('hidden');
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = randomPwd;
+    });
+  }
+
+  const btnChangePwdModal = document.getElementById('btn-change-password');
+  if (btnChangePwdModal) {
+    btnChangePwdModal.addEventListener('click', () => {
+      document.getElementById('password-modal').classList.remove('hidden');
+    });
+  }
+  
+  const btnClosePwdModal = document.getElementById('btn-close-pwd-modal');
+  if (btnClosePwdModal) {
+    btnClosePwdModal.addEventListener('click', () => {
+      document.getElementById('password-modal').classList.add('hidden');
+    });
+  }
+
+  const btnSubmitPwd = document.getElementById('btn-submit-pwd');
+  if (btnSubmitPwd) {
+    btnSubmitPwd.addEventListener('click', () => {
+      const newPwd = document.getElementById('new-password').value;
+      if (newPwd && currentEmail) {
+        usersDB[currentEmail] = newPwd;
+        localStorage.setItem('coffee_users_db', JSON.stringify(usersDB));
+        alert('密碼修改成功！下次請使用新密碼登入。');
+        document.getElementById('password-modal').classList.add('hidden');
+        document.getElementById('new-password').value = '';
+      } else {
+        alert('請輸入新密碼');
+      }
+    });
+  }
+
   document.getElementById('btn-logout').addEventListener('click', () => {
     currentUser = null;
+    currentEmail = null;
     localStorage.removeItem('coffee_user');
+    localStorage.removeItem('coffee_email');
     renderAuth();
   });
 
