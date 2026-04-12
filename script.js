@@ -249,8 +249,8 @@ function renderReviews(coffeeId) {
         labels.forEach((L, idx) => {
             let sVal = Math.round(r.stats[idx] || 0);
             sVal = Math.max(0, Math.min(5, sVal)); // 限制在 0-5
-            let stars = '★'.repeat(sVal) + '<span style="color:#555;">☆</span>'.repeat(5 - sVal);
-            gridHtml += `<div class="rs-item"><span class="rs-label">${L}</span><span class="rs-val">${stars}</span></div>`;
+            let stars = '*'.repeat(sVal) + '<span style="color:#aaa;">' + '*'.repeat(5 - sVal) + '</span>';
+            gridHtml += `<div class="rs-item"><span class="rs-label">${L}</span><div class="rs-val-text" style="font-size: 1.2rem; line-height: 1; margin-top: 2px;">${stars}</div></div>`;
         });
         
         let scoreToDisplay = r.userAvg || r.avg || '-';
@@ -657,14 +657,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // 初始化自訂星星
+  // 初始化自訂豆子評分
   let currentStars = [5, 5, 5, 5, 5];
   document.querySelectorAll('.stars').forEach(container => {
     const idx = parseInt(container.dataset.idx);
     container.innerHTML = '';
     for(let i=1; i<=5; i++){
       let s = document.createElement('span');
-      s.textContent = '★';
+      s.textContent = '*';
       s.className = 'star-icon active';
       s.dataset.val = i;
       s.addEventListener('click', () => {
@@ -679,10 +679,10 @@ document.addEventListener('DOMContentLoaded', () => {
     container.querySelectorAll('.star-icon').forEach(s => {
       if(parseInt(s.dataset.val) <= val) {
         s.classList.add('active');
-        s.textContent = '★';
+        s.style.color = 'var(--accent-gold)';
       } else {
         s.classList.remove('active');
-        s.textContent = '☆';
+        s.style.color = '#ccc';
       }
     });
   }
@@ -736,7 +736,6 @@ function showCoffeeDetails(cafeName, coffee) {
   activeCoffeeId = coffee.id;
   activeCoffeeObj = coffee;
   
-  // 確保畫面維持在最上方（防止外層捲軸意外產生時地圖跑版）
   if (window.scrollY > 0) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -747,13 +746,72 @@ function showCoffeeDetails(cafeName, coffee) {
   const placeholder = document.getElementById('welcome-placeholder');
   if (placeholder) placeholder.classList.add('hidden');
   
-  // 強制重新觸發動畫
   detailsCard.style.animation = 'none';
-  detailsCard.offsetHeight; // trigger reflow
+  detailsCard.offsetHeight; 
   detailsCard.style.animation = null; 
   
   document.getElementById('coffee-name').textContent = coffee.name;
-  // 移除原來「來自：XXX」
+  
+  // ======= 國家客製化海報與國旗色彩邏輯 =======
+  let posterMap = {
+      '衣索比亞': 'poster_ethiopia.png',
+      '肯亞': 'poster_ethiopia.png',
+      '盧安達': 'poster_ethiopia.png',
+      '蒲隆地': 'poster_ethiopia.png',
+      '哥倫比亞': 'poster_colombia.png',
+      '薩爾瓦多': 'poster_colombia.png',
+      '哥斯大黎加': 'poster_colombia.png',
+      '瓜地馬拉': 'poster_colombia.png',
+      '巴西': 'poster_colombia.png',
+      '宏都拉斯': 'poster_colombia.png',
+      '祕魯': 'poster_colombia.png',
+      '牙買加': 'poster_colombia.png',
+      '巴拿馬': 'poster_panama.png',
+      '印尼': 'poster_indonesia.png',
+      '葉門': 'poster_indonesia.png',
+      '台灣': 'poster_taiwan.png'
+  };
+
+  // 生成帶有黑底保護文字層的各國國旗漸層色
+  const shadowLayer = 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, transparent 100%)';
+  let flagMap = {
+      '衣索比亞': `${shadowLayer}, linear-gradient(135deg, rgba(8,142,67,0.7) 0%, rgba(252,209,22,0.7) 50%, rgba(239,33,40,0.7) 100%)`, 
+      '肯亞': `${shadowLayer}, linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(187,0,0,0.7) 50%, rgba(0,102,0,0.7) 100%)`,      
+      '盧安達': `${shadowLayer}, linear-gradient(135deg, rgba(0,161,222,0.7) 0%, rgba(250,210,1,0.7) 70%, rgba(32,96,61,0.7) 100%)`,    
+      '蒲隆地': `${shadowLayer}, linear-gradient(135deg, rgba(206,17,38,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(30,181,58,0.7) 100%)`,
+      '哥倫比亞': `${shadowLayer}, linear-gradient(135deg, rgba(255,205,0,0.7) 0%, rgba(0,48,135,0.7) 60%, rgba(200,16,46,0.7) 100%)`,  
+      '薩爾瓦多': `${shadowLayer}, linear-gradient(135deg, rgba(0,71,171,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(0,71,171,0.7) 100%)`,  
+      '哥斯大黎加': `${shadowLayer}, linear-gradient(135deg, rgba(0,43,127,0.7) 0%, rgba(255,255,255,0.7) 30%, rgba(206,17,38,0.7) 50%, rgba(255,255,255,0.7) 70%, rgba(0,43,127,0.7) 100%)`,
+      '瓜地馬拉': `${shadowLayer}, linear-gradient(135deg, rgba(73,151,208,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(73,151,208,0.7) 100%)`,
+      '巴西': `${shadowLayer}, linear-gradient(135deg, rgba(0,156,59,0.7) 0%, rgba(255,223,0,0.7) 60%, rgba(0,39,118,0.7) 100%)`,      
+      '宏都拉斯': `${shadowLayer}, linear-gradient(135deg, rgba(0,115,207,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(0,115,207,0.7) 100%)`,
+      '祕魯': `${shadowLayer}, linear-gradient(135deg, rgba(217,16,35,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(217,16,35,0.7) 100%)`,
+      '牙買加': `${shadowLayer}, linear-gradient(135deg, rgba(0,155,58,0.7) 0%, rgba(254,209,0,0.7) 50%, rgba(0,0,0,0.7) 100%)`,
+      '巴拿馬': `${shadowLayer}, linear-gradient(135deg, rgba(0,82,147,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(210,16,52,0.7) 100%)`,    
+      '印尼': `${shadowLayer}, linear-gradient(135deg, rgba(255,0,0,0.7) 0%, rgba(255,255,255,0.7) 100%)`,      
+      '葉門': `${shadowLayer}, linear-gradient(135deg, rgba(206,17,38,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(0,0,0,0.7) 100%)`,      
+      '台灣': `${shadowLayer}, linear-gradient(135deg, rgba(0,41,204,0.7) 10%, rgba(255,255,255,0.7) 50%, rgba(222,33,40,0.7) 90%)`       
+  };
+  
+  let targetCountry = null;
+  Object.keys(posterMap).forEach(key => {
+      if (coffee.name.includes(key)) targetCountry = key;
+  });
+
+  let imgFile = targetCountry ? posterMap[targetCountry] : 'coffee_poster.png';
+  // 預設為原本的炭黑色漸層
+  let bannerFlagGradient = targetCountry && flagMap[targetCountry] ? flagMap[targetCountry] : 'linear-gradient(to top, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0.3) 100%)';
+
+  const bannerBg = document.querySelector('.imdb-banner-bg');
+  const posterImg = document.querySelector('.imdb-poster img');
+  const bannerContainer = document.querySelector('.imdb-banner');
+  
+  if (bannerBg) bannerBg.style.backgroundImage = `url('./${imgFile}?v=2')`;
+  if (posterImg) posterImg.src = `./${imgFile}?v=2`;
+  if (bannerContainer) {
+      bannerContainer.style.setProperty('--flag-gradient', bannerFlagGradient);
+  }
+  // ===================================
   
   const cafesContainer = document.getElementById('coffee-cafes-list');
   if (cafesContainer) {

@@ -100,32 +100,28 @@
             <div id="reviews-list" class="reviews-list" style="margin-top: 1.5rem;"></div>
 
             <form id="review-form" class="review-form">
-                <div class="rating-inputs">
-                    <div class="r-row" style="margin-bottom: 10px;">
-                        <label style="width:100px;">總評分(1-10)</label>
+                <div class="rating-inputs" style="padding: 10px; margin-bottom: 10px; gap: 5px;">
+                    <div class="r-row" style="margin-bottom: 5px;">
+                        <label style="width:80px;">總評(1-10)</label>
                         <input type="range" id="overall-score-in" min="1" max="10" value="8" style="flex:1;">
                         <span id="overall-val"
-                            style="color:var(--accent-gold); font-size:1.2rem; font-weight:bold; width:30px; text-align:right;">8</span>
+                            style="color:var(--accent-gold); font-size:1.1rem; font-weight:bold; width:20px; text-align:right;">8</span>
                     </div>
-                    <div style="border-top:1px dashed #eee; margin: 10px 0;"></div>
-                    <div class="r-row"><label>香氣</label>
-                        <div class="stars" data-idx="0"></div>
-                    </div>
-                    <div class="r-row"><label>酸度</label>
-                        <div class="stars" data-idx="1"></div>
-                    </div>
-                    <div class="r-row"><label>甜度</label>
-                        <div class="stars" data-idx="2"></div>
-                    </div>
-                    <div class="r-row"><label>厚度</label>
-                        <div class="stars" data-idx="3"></div>
-                    </div>
-                    <div class="r-row"><label>餘韻</label>
-                        <div class="stars" data-idx="4"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border-top:1px dashed #eee; padding-top: 5px;">
+                        <div class="r-row"><label style="width: 40px; font-size:0.85rem;">香氣</label>
+                            <div class="stars" data-idx="0"></div></div>
+                        <div class="r-row"><label style="width: 40px; font-size:0.85rem;">酸度</label>
+                            <div class="stars" data-idx="1"></div></div>
+                        <div class="r-row"><label style="width: 40px; font-size:0.85rem;">甜度</label>
+                            <div class="stars" data-idx="2"></div></div>
+                        <div class="r-row"><label style="width: 40px; font-size:0.85rem;">厚度</label>
+                            <div class="stars" data-idx="3"></div></div>
+                        <div class="r-row"><label style="width: 40px; font-size:0.85rem;">餘韻</label>
+                            <div class="stars" data-idx="4"></div></div>
                     </div>
                 </div>
-                <textarea id="review-input" placeholder="寫下您對這支豆子的風味感受..." required></textarea>
-                <button type="submit" class="btn-submit">送出評論</button>
+                <textarea id="review-input" placeholder="寫下您對這支豆子的風味感受..." required style="min-height: 60px; margin-bottom: 5px; padding: 10px;"></textarea>
+                <button type="submit" class="btn-submit" style="padding: 10px;">送出評論</button>
             </form>
             <div id="login-prompt"
                 style="text-align:center; padding: 1.5rem; color: #555; background: #fafafa; border: 1px dashed #ccc; border-radius: 8px; margin-top: 1rem;">
@@ -149,47 +145,77 @@
 
         <!-- 右側：風味雷達圖與評論 -->
         <section class="content">
-            <div id="coffee-details" class="details-card hidden">
+            <div id="coffee-details" class="details-card imdb-card hidden">
                 <button id="btn-close-details" class="mobile-close-btn">&times;</button>
-                <div class="card-header">
-                    <div class="title-wrap">
-                        <h2 id="coffee-name">請選擇一款咖啡</h2>
-                        <h3 id="cafe-name-display" class="subtitle" style="display: none;"></h3>
-                    </div>
-                    <div class="rating-box">
-                        <div class="star">★</div>
-                        <div class="score-wrap">
-                            <span id="coffee-score" class="score">--</span><span class="max-score">/10</span>
+                
+                <!-- IMDB Hero Banner 區塊 -->
+                <div class="imdb-banner">
+                    <!-- 背景模糊層 -->
+                    <div class="imdb-banner-bg" style="background-image: url('./coffee_poster.png');"></div>
+                    <div class="imdb-banner-overlay"></div>
+                    
+                    <div class="imdb-banner-content">
+                        <!-- 海報 -->
+                        <div class="imdb-poster">
+                            <img src="./coffee_poster.png" alt="Coffee Poster">
+                        </div>
+                        
+                        <!-- 標題與評分資訊 -->
+                        <div class="imdb-info">
+                            <h2 id="coffee-name" class="imdb-title">請選擇一款咖啡</h2>
+                            <h3 id="cafe-name-display" class="imdb-subtitle" style="display: none;"></h3>
+                            
+                            <div class="imdb-rating-wrap">
+                                <div class="imdb-rating-col">
+                                    <span class="imdb-rating-label">COFFEE RATING</span>
+                                    <div style="display:flex; align-items:center;">
+                                        <span class="imdb-star">★</span>
+                                        <div class="imdb-score-wrap">
+                                            <span id="coffee-score" class="imdb-score">--</span><span class="imdb-max">/10</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="imdb-rating-col">
+                                    <span class="imdb-rating-label">YOUR RATING</span>
+                                    <div class="imdb-rate-action">
+                                        <span class="imdb-star outline">☆</span>
+                                        <span style="color:#57a3e8; font-weight:bold; cursor:pointer;" onclick="document.getElementById('btn-open-reviews').click()">Rate</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 雷達圖移至總評分下方 -->
-                <div class="chart-section"
-                    style="border:none; padding:0; margin-bottom: 1rem; background: transparent;">
-                    <div class="chart-wrapper" style="height: 320px;">
-                        <canvas id="radarChart"></canvas>
+                <!-- IMDB 內文區塊 -->
+                <div class="imdb-body">
+                    <div class="imdb-top-split">
+                        <!-- 風味筆記 -->
+                        <div class="desc-box imdb-desc-box">
+                            <h4 class="imdb-section-title">風味簡介</h4>
+                            <p id="coffee-desc" class="desc"></p>
+                        </div>
+
+                        <!-- 推薦店家 -->
+                        <div class="cafes-box desc-box imdb-desc-box">
+                            <h4 class="imdb-section-title">供應門市</h4>
+                            <div id="coffee-cafes-list" class="tags-container" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- 風味筆記 -->
-                <div class="desc-box">
-                    <h4 class="section-title">風味筆記</h4>
-                    <p id="coffee-desc" class="desc"></p>
-                </div>
+                    <!-- 雷達圖 -->
+                    <div class="chart-section" style="border:none; padding:0; margin-top: 1rem; background: transparent;">
+                        <h4 class="imdb-section-title">風味雷達圖</h4>
+                        <div class="chart-wrapper" style="height: 320px; max-width: 100%;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
 
-                <!-- 單品店家 -->
-                <div class="cafes-box desc-box" style="margin-top: 1.5rem;">
-                    <h4 class="section-title" style="margin-bottom: 0.8rem;">單品店家</h4>
-                    <div id="coffee-cafes-list" class="tags-container"
-                        style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                    <!-- 評論按鈕 -->
+                    <button id="btn-open-reviews" class="btn-outline imdb-btn-action">
+                        查看完整客戶評論
+                    </button>
                 </div>
-
-                <!-- 開啟評論彈窗按鈕 -->
-                <button id="btn-open-reviews" class="btn-outline"
-                    style="width: 100%; border-radius: 8px; padding: 1rem; font-size: 1.1rem; border-color: var(--accent-gold); color: var(--accent-gold); margin-top: 0.5rem;">
-                    查看與撰寫評論
-                </button>
             </div>
 
             <!-- 空白狀態畫面 -->
