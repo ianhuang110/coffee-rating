@@ -227,27 +227,18 @@
             </div>
 
             <!-- 空白狀態畫面 -->
-            <div id="welcome-placeholder" class="placeholder-wrapper" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                <div class="hero-img-box">
-                    <div class="hero-img-inner">
-                        <img src="./hero-image.png" alt="Barista Pour Over">
-                        
-                        <!-- 局部動態特效：蒸氣 -->
-                        <div class="overlay-steam steam-fx-1" style="top: 55%; left: 42%;"></div>
-                        <div class="overlay-steam steam-fx-2" style="top: 58%; left: 48%;"></div>
-                        <div class="overlay-steam steam-fx-3" style="top: 56%; left: 52%;"></div>
-                        
-                        <!-- 局部動態特效：咖啡滴落 -->
-                        <div class="overlay-drip drip-fx-1" style="top: 71%; left: 49.5%;"></div>
-                        <div class="overlay-drip drip-fx-2" style="top: 71%; left: 49.5%;"></div>
-                        
-                        <!-- 局部動態特效：咖啡液面波紋 -->
-                        <div class="overlay-ripple ripple-fx-1" style="top: 80.5%; left: 47%;"></div>
-                        <div class="overlay-ripple ripple-fx-2" style="top: 80.5%; left: 47%;"></div>
-                    </div>
-                </div>
+            <div id="welcome-placeholder" class="placeholder-wrapper" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 3rem 1rem; overflow-y: auto; height: 100%; box-sizing: border-box;">
+
                 <h2 style="color:var(--accent-gold); font-size:2.8rem; margin:0 0 10px 0; font-family: 'Noto Serif TC', serif; font-weight: 700; letter-spacing: 2px;">探索單品咖啡</h2>
                 <p style="color:#666; font-size:1.1rem; max-width: 100%; line-height: 1.6; margin: 0;">請從清單選擇一款感興趣的咖啡豆，<br>查看詳細的風味雷達圖、網友評論推薦店家。</p>
+                
+                <!-- 首頁熱門排行榜 -->
+                <div class="top5-section">
+                    <h3 class="top5-title">Top 5 on Coffee Rating <span class="arrow">&gt;</span></h3>
+                    <div id="top5-grid" class="top5-grid">
+                        <!-- JS 動態生成 -->
+                    </div>
+                </div>
             </div>
         </section>
     </main>

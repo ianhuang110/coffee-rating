@@ -636,6 +636,149 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function renderTop5Coffees() {
+    const top5Grid = document.getElementById('top5-grid');
+    if (!top5Grid) return;
+    
+    let allCoffees = [];
+    coffeeData.forEach(cafeObj => {
+       cafeObj.coffees.forEach(c => {
+           let country = c.name.split(' ')[0];
+           let baseScore = (c.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
+           allCoffees.push({
+               ...c,
+               country: country,
+               cafeName: cafeObj.cafe,
+               score: parseFloat(baseScore)
+           });
+       });
+    });
+
+    // 依分數高低排序，取最前面 5 名
+    allCoffees.sort((a,b) => b.score - a.score);
+    const top5 = allCoffees.slice(0, 5);
+    
+    top5Grid.innerHTML = '';
+    
+    let cardGradientMap = {
+        '衣索比亞': 'rgba(8,142,67,0.15) 0%, rgba(252,209,22,0.15) 50%, rgba(239,33,40,0.15) 100%', 
+        '肯亞': 'rgba(0,0,0,0.15) 0%, rgba(187,0,0,0.15) 50%, rgba(0,102,0,0.15) 100%',      
+        '盧安達': 'rgba(0,161,222,0.15) 0%, rgba(250,210,1,0.15) 70%, rgba(32,96,61,0.15) 100%',    
+        '蒲隆地': 'rgba(206,17,38,0.15) 0%, rgba(255,255,255,0.15) 50%, rgba(30,181,58,0.15) 100%',
+        '哥倫比亞': 'rgba(255,205,0,0.15) 0%, rgba(0,48,135,0.15) 60%, rgba(200,16,46,0.15) 100%',  
+        '薩爾瓦多': 'rgba(0,71,171,0.15) 0%, rgba(255,255,255,0.15) 50%, rgba(0,71,171,0.15) 100%',  
+        '哥斯大黎加': 'rgba(0,43,127,0.15) 0%, rgba(255,255,255,0.15) 30%, rgba(206,17,38,0.15) 50%, rgba(255,255,255,0.15) 70%, rgba(0,43,127,0.15) 100%',
+        '瓜地馬拉': 'rgba(73,151,208,0.15) 0%, rgba(255,255,255,0.15) 50%, rgba(73,151,208,0.15) 100%',
+        '巴西': 'rgba(0,156,59,0.15) 0%, rgba(255,223,0,0.15) 60%, rgba(0,39,118,0.15) 100%',      
+        '宏都拉斯': 'rgba(0,115,207,0.15) 0%, rgba(255,255,255,0.15) 50%, rgba(0,115,207,0.15) 100%',
+        '祕魯': 'rgba(217,16,35,0.15) 0%, rgba(255,255,255,0.15) 50%, rgba(217,16,35,0.15) 100%',
+        '牙買加': 'rgba(0,155,58,0.15) 0%, rgba(254,209,0,0.15) 50%, rgba(0,0,0,0.15) 100%',
+        '巴拿馬': 'rgba(0,82,147,0.15) 0%, rgba(255,255,255,0.15) 50%, rgba(210,16,52,0.15) 100%',    
+        '印尼': 'rgba(255,0,0,0.15) 0%, rgba(255,255,255,0.15) 100%',      
+        '葉門': 'rgba(206,17,38,0.15) 0%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.15) 100%',      
+        '台灣': 'rgba(0,41,204,0.15) 10%, rgba(255,255,255,0.15) 50%, rgba(222,33,40,0.15) 90%'       
+    };
+
+    top5.forEach((coffee, index) => {
+        let posterMap = {
+            '衣索比亞': 'poster_ethiopia.png',
+            '肯亞': 'poster_ethiopia.png',
+            '盧安達': 'poster_ethiopia.png',
+            '蒲隆地': 'poster_ethiopia.png',
+            '哥倫比亞': 'poster_colombia.png',
+            '薩爾瓦多': 'poster_colombia.png',
+            '哥斯大黎加': 'poster_colombia.png',
+            '瓜地馬拉': 'poster_colombia.png',
+            '巴西': 'poster_colombia.png',
+            '宏都拉斯': 'poster_colombia.png',
+            '祕魯': 'poster_colombia.png',
+            '牙買加': 'poster_colombia.png',
+            '巴拿馬': 'poster_panama.png',
+            '印尼': 'poster_indonesia.png',
+            '葉門': 'poster_indonesia.png',
+            '台灣': 'poster_taiwan.png'
+        };
+        
+        let posterImg = 'coffee_poster.png';
+        let bgGrad = 'none';
+        let bgGradHover = 'none';
+        
+        Object.keys(posterMap).forEach(key => {
+            if (coffee.name.includes(key)) posterImg = posterMap[key];
+        });
+        
+        Object.keys(cardGradientMap).forEach(key => {
+            if (coffee.name.includes(key)) {
+                bgGrad = `linear-gradient(135deg, ${cardGradientMap[key]})`;
+                bgGradHover = bgGrad.replace(/0\.15/g, '0.25'); 
+            }
+        });
+
+        const card = document.createElement('div');
+        card.className = 'top5-card';
+        card.style.setProperty('--top5-bg', bgGrad);
+        card.style.setProperty('--top5-bg-hover', bgGradHover);
+        
+        // 隨機產生投票數營造社群感 (10~59K)
+        let randomVotes = Math.floor(Math.random() * 50) + 10; 
+        
+        card.innerHTML = `
+          <div class="top5-badge">#${index + 1}</div>
+          <div class="top5-poster-wrap">
+             <img src="./${posterImg}" class="top5-poster" alt="poster">
+             <div class="top5-poster-overlay"></div>
+          </div>
+          <div class="top5-info">
+             <div class="top5-name">${coffee.name}</div>
+             <div class="top5-meta">${coffee.cafeName} • 原豆單品</div>
+             <div class="top5-rate-row">
+                 <div class="top5-score-box">
+                    <span style="color:#f5c518; font-size:1.2rem;">★</span>
+                    <span class="top5-score-val">${coffee.score.toFixed(1)}</span>
+                    <span class="top5-score-count">(${randomVotes}K)</span>
+                 </div>
+                 <div class="top5-action" style="margin-left: auto;">
+                    <span style="color:#57a3e8;">☆</span> Rate
+                 </div>
+             </div>
+             <div class="top5-action" style="margin-top:0;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>
+                View Details
+             </div>
+          </div>
+        `;
+        
+        card.addEventListener('click', () => {
+            showCoffeeDetails(coffee.cafeName, coffee);
+            // 手動觸發選單狀態同步並展開對應層級
+            const sidebarItem = document.querySelector(`.coffee-item[data-id="${coffee.id}"]`);
+            if(sidebarItem) {
+                // 展開所屬國家折疊選單
+                const countryList = sidebarItem.closest('.country-list');
+                if (countryList) {
+                    countryList.classList.add('open');
+                    if (countryList.previousElementSibling) countryList.previousElementSibling.classList.add('open');
+                }
+                
+                // 展開所屬洲別折疊選單
+                const contBody = sidebarItem.closest('.continent-body');
+                if (contBody) {
+                    contBody.classList.add('open');
+                    if (contBody.previousElementSibling) contBody.previousElementSibling.classList.add('open');
+                }
+                
+                // 觸發選中與捲動
+                sidebarItem.click();
+                setTimeout(() => {
+                    sidebarItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        });
+        
+        top5Grid.appendChild(card);
+    });
+  }
+
   // 初始渲染
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get('search');
@@ -646,6 +789,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     renderCafeList();
   }
+  
+  // 渲染 Top 5 排行榜
+  renderTop5Coffees();
 
   // 綁定搜尋輸入
   if (searchInput) {
