@@ -976,12 +976,12 @@ body {
     padding: 0;
   }
   .content {
-    flex: 0 0 50vh;
+    flex: 0 0 60vh;
     order: 1;
   }
   .sidebar {
     flex: 1;
-    height: 50vh;
+    height: 40vh;
     max-height: none;
     order: 2;
     border-right: none;
