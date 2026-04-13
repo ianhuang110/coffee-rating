@@ -838,6 +838,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebar) sidebar.classList.add('active');
     if (sidebarOverlay) sidebarOverlay.classList.add('active');
     renderCafeList(searchParam);
+    
+    // 取得參數後自動清除網址列中的 ?search=，避免後續按重新整理時又觸發自動開出側邊欄
+    if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
   } else {
     renderCafeList();
   }
@@ -848,12 +853,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // 綁定搜尋輸入
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
-      const val = e.target.value;
-      if (val && !sidebar.classList.contains('active')) {
-         sidebar.classList.add('active');
-         sidebarOverlay.classList.add('active');
+      renderCafeList(e.target.value);
+    });
+    
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = e.target.value;
+        if (val && !sidebar.classList.contains('active')) {
+           sidebar.classList.add('active');
+           sidebarOverlay.classList.add('active');
+           
+           const topSearchPopup = document.getElementById('topbar-search-popup');
+           if (topSearchPopup) topSearchPopup.classList.add('hidden');
+           searchInput.blur(); // 隱藏鍵盤
+        }
       }
-      renderCafeList(val);
     });
   }
 
