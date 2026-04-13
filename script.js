@@ -835,6 +835,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
   if (searchParam) {
     if (searchInput) searchInput.value = searchParam;
+    if (sidebar) sidebar.classList.add('active');
+    if (sidebarOverlay) sidebarOverlay.classList.add('active');
     renderCafeList(searchParam);
   } else {
     renderCafeList();
@@ -846,7 +848,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // 綁定搜尋輸入
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
-      renderCafeList(e.target.value);
+      const val = e.target.value;
+      if (val && !sidebar.classList.contains('active')) {
+         sidebar.classList.add('active');
+         sidebarOverlay.classList.add('active');
+      }
+      renderCafeList(val);
     });
   }
 
