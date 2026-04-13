@@ -15,11 +15,13 @@
 <body>
     <nav class="topbar">
         <div class="logo">Coffee Rating</div>
-        <div class="auth-section">
-            <span id="user-display"></span>
-            <button id="btn-login" class="btn-outline">會員登入</button>
-            <button id="btn-change-password" class="btn-outline hidden">更改密碼</button>
-            <button id="btn-logout" class="btn-outline hidden">登出</button>
+        <div class="auth-section" style="flex-direction: column; align-items: flex-end; gap: 8px;">
+            <span id="user-display" style="white-space: nowrap;"></span>
+            <div style="display: flex; gap: 8px;">
+                <button id="btn-login" class="btn-outline" style="white-space: nowrap;">會員登入</button>
+                <button id="btn-change-password" class="btn-outline hidden" style="white-space: nowrap;">更改密碼</button>
+                <button id="btn-logout" class="btn-outline hidden" style="white-space: nowrap;">登出</button>
+            </div>
         </div>
     </nav>
 
