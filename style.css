@@ -1096,12 +1096,29 @@ body {
 }
 
 .top5-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding: 5px 0 20px 0; /* 給予陰影和捲軸一些空間 */
+  scroll-snap-type: x mandatory;
+}
+
+/* 訂製 Top5 專屬小捲軸 */
+.top5-grid::-webkit-scrollbar {
+  height: 6px;
+}
+.top5-grid::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 10px;
+}
+.top5-grid::-webkit-scrollbar-thumb {
+  background: var(--accent-gold);
+  border-radius: 10px;
 }
 
 .top5-card {
+  flex: 0 0 340px;
+  scroll-snap-align: start;
   background: var(--top5-bg, none), #1f1f1f;
   border-radius: 8px;
   display: flex;
