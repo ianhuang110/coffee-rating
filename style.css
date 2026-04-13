@@ -46,15 +46,21 @@ body {
   font-size: 1.6rem;
   font-weight: 800;
   color: var(--accent-gold);
-  letter-spacing: 1.5px;
+  background: #111;
+  padding: 0.1rem 0.6rem;
+  border-radius: 4px;
+  letter-spacing: 1px;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, filter 0.2s ease;
   font-family: 'Oswald', 'Noto Sans TC', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo:hover {
-  transform: scale(1.02);
-  opacity: 0.8;
+  transform: scale(1.03);
+  filter: brightness(1.2);
 }
 
 .auth-section {
@@ -152,19 +158,44 @@ body {
   position: relative;
 }
 
-/* 側邊欄：白底風格 */
+/* 側邊欄：白底風格 (側頁框架 Drawer) */
 .sidebar {
-  flex: 0 0 340px;
+  position: fixed;
+  top: 0;
+  left: -360px;
+  width: 340px;
+  max-width: 85vw;
   background: #ffffff;
-  border-right: 1px solid #f0f0f0;
   padding: 2rem 1.5rem;
-  height: 100%;
-  max-height: none;
+  height: 100vh;
+  box-shadow: 4px 0 25px rgba(0,0,0,0.08);
   overflow-y: auto;
-  border-radius: 0; 
-  box-shadow: 2px 0 20px rgba(0,0,0,0.03);
+  z-index: 3000;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
-  z-index: 10;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.4);
+  z-index: 2999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -971,21 +1002,23 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+  body {
+    height: auto;
+    overflow: visible;
+  }
   .container {
     flex-direction: column;
     padding: 0;
+    height: auto;
+    overflow: visible;
   }
   .content {
-    flex: 0 0 60vh;
+    flex: none;
     order: 1;
+    overflow: visible;
   }
   .sidebar {
-    flex: 1;
-    height: 40vh;
-    max-height: none;
-    order: 2;
-    border-right: none;
-    border-top: 1px solid var(--accent-gold);
+    padding: 1.5rem 1rem;
   }
   .details-card {
     position: static;

@@ -8,19 +8,38 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#cfa968">
     <link rel="apple-touch-icon" href="./icon.svg">
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=13">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    <nav class="topbar">
-        <div class="logo">Coffee Rating</div>
-        <div class="auth-section" style="flex-direction: column; align-items: flex-end; gap: 8px;">
-            <span id="user-display" style="white-space: nowrap;"></span>
-            <div style="display: flex; gap: 8px;">
-                <button id="btn-login" class="btn-outline" style="white-space: nowrap;">會員登入</button>
-                <button id="btn-change-password" class="btn-outline hidden" style="white-space: nowrap;">更改密碼</button>
-                <button id="btn-logout" class="btn-outline hidden" style="white-space: nowrap;">登出</button>
+    <nav class="topbar" style="display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button id="btn-toggle-sidebar" style="background: transparent; border: none; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; padding: 4px;">
+                <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div class="logo">CR</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; position: relative;">
+            <button id="btn-topbar-search-icon" style="background: transparent; border: none; cursor: pointer; color: #555; display: flex; align-items: center; justify-content: center; padding: 5px;">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+            <div id="topbar-search-popup" class="hidden" style="position: absolute; right: 0; top: 100%; margin-top: 8px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 2000; border: 1px solid #f0f0f0; width: 280px;">
+                <input type="text" id="search-input" class="search-input" placeholder="Search 單品咖啡" style="width: 100%; margin: 0; box-sizing: border-box;">
+            </div>
+            
+            <button onclick="window.location.href='map.html'" class="btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border-radius: 20px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                地圖
+            </button>
+
+            <div class="auth-section" style="flex-direction: column; align-items: flex-end; gap: 8px;">
+                <span id="user-display" style="white-space: nowrap;"></span>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-login" class="btn-outline" style="white-space: nowrap;">會員登入</button>
+                    <button id="btn-change-password" class="btn-outline hidden" style="white-space: nowrap;">更改密碼</button>
+                    <button id="btn-logout" class="btn-outline hidden" style="white-space: nowrap;">登出</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -136,18 +155,16 @@
 
 
     <main class="container">
-        <!-- 左側：多層次清單 (黑金風格) -->
+        <!-- Overlay -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- 左側：多層次清單 (獨立側頁 Drawer) -->
         <aside class="sidebar">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--accent-gold); margin-bottom: 1rem; padding-bottom: 0.5rem;">
-                <h2 class="sidebar-title" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">單品咖啡搜尋</h2>
-                <button onclick="window.location.href='map.html'" class="btn-outline" style="padding: 0.2rem 0.6rem; font-size: 0.85rem; border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    查看地圖
-                </button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px dashed var(--accent-gold); padding-bottom: 10px;">
+                <h2 style="margin: 0; font-size: 1.3rem; color: var(--accent-gold); letter-spacing: 1px;">選擇各洲別</h2>
+                <button id="btn-close-sidebar" style="background: transparent; border: none; font-size: 2rem; line-height: 1; color: #999; cursor: pointer; padding: 0;">&times;</button>
             </div>
-            <div class="search-box">
-                <input type="text" id="search-input" class="search-input" placeholder="搜尋哪裡喝得到指定單品 (例：藝伎)">
-            </div>
+            <!-- 搜尋與地圖已移至上方 topbar -->
             <div id="cafe-list" class="accordion"></div>
         </aside>
 
@@ -243,7 +260,7 @@
         </section>
     </main>
 
-    <script src="script.js?v=7"></script>
+    <script src="script.js?v=13"></script>
 </body>
 
 </html>

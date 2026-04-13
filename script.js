@@ -470,6 +470,54 @@ document.addEventListener('DOMContentLoaded', () => {
   const cafeListContainer = document.getElementById('cafe-list');
   const searchInput = document.getElementById('search-input');
   
+  // Drawer sidebar logic
+  const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+  const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+  function closeSidebar() {
+      if(sidebar) sidebar.classList.remove('active');
+      if(sidebarOverlay) sidebarOverlay.classList.remove('active');
+  }
+  window.closeSidebar = closeSidebar;
+
+  if(btnToggleSidebar && sidebar && sidebarOverlay) {
+      btnToggleSidebar.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sidebar.classList.add('active');
+          sidebarOverlay.classList.add('active');
+      });
+      sidebarOverlay.addEventListener('click', closeSidebar);
+      if(btnCloseSidebar) {
+          btnCloseSidebar.addEventListener('click', closeSidebar);
+      }
+  }
+
+  // Topbar 搜尋按鈕開啟與關閉邏輯
+  const btnTopSearch = document.getElementById('btn-topbar-search-icon');
+  const topSearchPopup = document.getElementById('topbar-search-popup');
+  if (btnTopSearch && topSearchPopup) {
+    btnTopSearch.addEventListener('click', (e) => {
+      e.stopPropagation();
+      topSearchPopup.classList.toggle('hidden');
+      if (!topSearchPopup.classList.contains('hidden')) {
+        searchInput.focus();
+      }
+    });
+    
+    // 點擊空白處關閉搜尋方塊
+    document.addEventListener('click', (e) => {
+      if (!topSearchPopup.classList.contains('hidden') && !topSearchPopup.contains(e.target) && !btnTopSearch.contains(e.target)) {
+        topSearchPopup.classList.add('hidden');
+      }
+    });
+    // 點擊搜尋輸入框不會關閉
+    topSearchPopup.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+  
   // 評論 Modal 開關
   const btnOpenReviews = document.getElementById('btn-open-reviews');
   if (btnOpenReviews) {
@@ -619,6 +667,8 @@ document.addEventListener('DOMContentLoaded', () => {
               document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
               item.classList.add('active');
               showCoffeeDetails(coffee.cafeName, coffee);
+              
+              if(window.closeSidebar) window.closeSidebar(); // auto close on mobile/drawer selection
               
               // 不再單純平移，這裡已經觸發了 showCoffeeDetails，由那邊負責篩選與縮放。
             });
