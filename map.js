@@ -46,6 +46,10 @@ const cafeCoordinates = {
       marker.on('mouseout', function () {
           this.closePopup();
       });
+      
+      marker.on('click', function () {
+          window.location.href = `index.html?search=${encodeURIComponent(cafe)}`;
+      });
   });
   
   if (mapBounds.isValid()) {

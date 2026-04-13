@@ -634,7 +634,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 初始渲染
-  renderCafeList();
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchParam = urlParams.get('search');
+  
+  if (searchParam) {
+    if (searchInput) searchInput.value = searchParam;
+    renderCafeList(searchParam);
+  } else {
+    renderCafeList();
+  }
 
   // 綁定搜尋輸入
   if (searchInput) {

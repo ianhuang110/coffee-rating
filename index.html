@@ -107,7 +107,7 @@
                         <span id="overall-val"
                             style="color:var(--accent-gold); font-size:1.1rem; font-weight:bold; width:20px; text-align:right;">8</span>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border-top:1px dashed #eee; padding-top: 5px;">
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px; border-top:1px dashed #eee; padding-top: 10px;">
                         <div class="r-row"><label style="width: 40px; font-size:0.85rem;">香氣</label>
                             <div class="stars" data-idx="0"></div></div>
                         <div class="r-row"><label style="width: 40px; font-size:0.85rem;">酸度</label>
@@ -136,7 +136,13 @@
     <main class="container">
         <!-- 左側：多層次清單 (黑金風格) -->
         <aside class="sidebar">
-            <h2 class="sidebar-title">單品咖啡搜尋</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--accent-gold); margin-bottom: 1rem; padding-bottom: 0.5rem;">
+                <h2 class="sidebar-title" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">單品咖啡搜尋</h2>
+                <button onclick="window.location.href='map.html'" class="btn-outline" style="padding: 0.2rem 0.6rem; font-size: 0.85rem; border-radius: 4px; display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    查看地圖
+                </button>
+            </div>
             <div class="search-box">
                 <input type="text" id="search-input" class="search-input" placeholder="搜尋哪裡喝得到指定單品 (例：藝伎)">
             </div>
