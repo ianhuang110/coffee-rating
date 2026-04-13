@@ -1130,10 +1130,9 @@ body {
 
 .top5-grid {
   display: flex;
+  flex-direction: column;
   gap: 15px;
-  overflow-x: auto;
-  padding: 5px 0 20px 0; /* 給予陰影和捲軸一些空間 */
-  scroll-snap-type: x mandatory;
+  padding: 5px 0 20px 0;
 }
 
 /* 訂製 Top5 專屬小捲軸 */
@@ -1150,8 +1149,7 @@ body {
 }
 
 .top5-card {
-  flex: 0 0 340px;
-  scroll-snap-align: start;
+  width: 100%;
   background: var(--top5-bg, transparent);
   border-radius: 8px;
   display: flex;
