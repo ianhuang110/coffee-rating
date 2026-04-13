@@ -256,7 +256,7 @@ function renderReviews(coffeeId) {
         let scoreToDisplay = r.userAvg || r.avg || '-';
         scoreHtml = `
           <div style="margin-bottom: 5px; display:flex; align-items:center;">
-            <strong style="color:var(--accent-gold); font-size: 1.2rem; border: 1px solid var(--accent-gold); padding: 4px 10px; border-radius:4px; margin-right: 15px;">★ ${scoreToDisplay} / 10</strong> 
+            <strong style="color:var(--accent-gold); font-size: 1.2rem; border: 1px solid var(--accent-gold); padding: 4px 10px; border-radius:4px; margin-right: 15px;">${scoreToDisplay} / 10</strong> 
           </div>
           <div class="review-stats-grid">
              ${gridHtml}
@@ -270,8 +270,11 @@ function renderReviews(coffeeId) {
           <strong style="color:#333; font-size:1.1rem; border-left: 3px solid var(--accent-gold); padding-left:8px;">${author}</strong>
           <span style="color:#888; font-size:0.85rem;">[${r.date}]</span>
         </div>
-        ${scoreHtml} 
-        <div style="margin-top:15px; font-size:1.05rem; color:#555; line-height: 1.6;">${r.text}</div>
+        <div style="font-size:1.05rem; color:#555; line-height: 1.6; margin-bottom: 15px;">${r.text}</div>
+        <div style="border-top: 1px dashed #eee; padding-top: 12px;">
+          <div style="font-size: 0.9rem; color: #888; margin-bottom: 8px;">您的評分紀錄:</div>
+          ${scoreHtml}
+        </div>
       `;
       reviewsContainer.appendChild(item);
     });
