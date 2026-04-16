@@ -171,35 +171,40 @@ let currentCoffeeStores = [];
 
 // 原本地圖的地標變數可保留，若不需要也可刪除。這裡我們暫停使用。
 
-// 客座評論的本地儲存機制 (使用 LocalStorage 模擬)
-function getReviews(coffeeId) {
-  const reviewsJson = localStorage.getItem(`coffee_reviews_${coffeeId}`);
-  if (reviewsJson) {
-    return JSON.parse(reviewsJson);
+// 客座評論 (改接 Firebase)
+async function getReviews(coffeeId) {
+  // 若 Firebase 尚未載入完成 (因 module 稍有延遲)，加上簡單等待
+  let retryCount = 0;
+  while (!window.firebaseDB && retryCount < 20) {
+    await new Promise(resolve => setTimeout(resolve, 50));
+    retryCount++;
+  }
+  
+  if (window.firebaseDB) {
+     return await window.firebaseDB.getReviews(coffeeId);
   } else {
-    // 預設假資料
-    return [
-      { text: "這支豆子真的很有層次，推！", date: "2023-10-01", stats: [5, 4, 4, 3, 5], userAvg: "8" }
-    ];
+     console.error("Firebase SDK 未準備好");
+     return [];
   }
 }
 
-function saveReview(coffeeId, text, stats, overallScore) {
-  const reviews = getReviews(coffeeId);
-  const now = new Date();
-  const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-  
+async function saveReview(coffeeId, text, stats, overallScore) {
   const userName = currentUser ? currentUser : '訪客';
-  reviews.push({ user: userName, text: text, date: dateStr, stats: stats, userAvg: overallScore });
-  localStorage.setItem(`coffee_reviews_${coffeeId}`, JSON.stringify(reviews));
-  renderReviews(coffeeId);
+  
+  // 新增 Firebase 版的紀錄
+  if (window.firebaseDB) {
+      await window.firebaseDB.saveReview(coffeeId, text, stats, overallScore, userName);
+  }
+  
+  // 重新從 DB 拉取並渲染
+  await renderReviews(coffeeId);
 }
 
-function renderReviews(coffeeId) {
+async function renderReviews(coffeeId) {
   const reviewsContainer = document.getElementById('reviews-list');
-  reviewsContainer.innerHTML = '';
+  reviewsContainer.innerHTML = '<div style="text-align:center; padding: 2rem; color: #888;">正在載入評論...</div>';
   
-  const reviews = getReviews(coffeeId);
+  const reviews = await getReviews(coffeeId);
   let dynamicStats = activeCoffeeObj ? activeCoffeeObj.stats.map(s => Math.round(s)) : [5,5,5,5,5];
   
   // 計算這支咖啡的平均總分與五感動態變化
@@ -301,22 +306,23 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-close-modal').addEventListener('click', () => {
     document.getElementById('login-modal').classList.add('hidden');
   });
-  document.getElementById('btn-submit-login').addEventListener('click', () => {
+  document.getElementById('btn-submit-login').addEventListener('click', async () => {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     if(email && password) {
-      const userRecord = usersDB[email];
-      const validPwd = (typeof userRecord === 'string') ? userRecord : (userRecord ? userRecord.password : null);
+       
+      if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
+      const res = await window.firebaseDB.loginUser(email, password);
       
-      if (validPwd && validPwd === password) {
-        currentUser = (typeof userRecord === 'object' && userRecord.name) ? userRecord.name : email.split('@')[0];
+      if (res.success) {
+        currentUser = res.user.name || email.split('@')[0];
         currentEmail = email;
         localStorage.setItem('coffee_user', currentUser);
         localStorage.setItem('coffee_email', currentEmail);
         renderAuth();
         document.getElementById('login-modal').classList.add('hidden');
       } else {
-        alert('Email 或密碼錯誤！（若還不是會員，請點選註冊）');
+        alert(res.message);
       }
     } else {
       alert('請輸入 Email 及密碼');
@@ -324,29 +330,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const linkForgotPwd = document.getElementById('link-forgot-password');
   if (linkForgotPwd) {
-    linkForgotPwd.addEventListener('click', (e) => {
+    linkForgotPwd.addEventListener('click', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       if (!email) {
         alert('請先在上方輸入您的 Email，然後再點擊忘記密碼！');
         return;
       }
-      if (!usersDB[email]) {
-        alert('找不到此 Email 的註冊紀錄，請先註冊會員！');
-        return;
-      }
-
-      const randomPwd = Math.random().toString(36).substring(2, 8);
-      const userRecord = usersDB[email];
-      if (typeof userRecord === 'object') {
-        userRecord.password = randomPwd;
-      } else {
-        usersDB[email] = randomPwd; 
-      }
-      localStorage.setItem('coffee_users_db', JSON.stringify(usersDB));
+      if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
       
-      alert(`【系統模擬】密碼重置成功，新密碼已發送至 ${email}！\n\n您的新密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請務必自行修改密碼。`);
-      document.getElementById('login-password').value = randomPwd;
+      const randomPwd = Math.random().toString(36).substring(2, 8);
+      const res = await window.firebaseDB.resetPassword(email, randomPwd);
+      if (res.success) {
+          alert(`【系統模擬】密碼重置成功，新密碼已發送至 ${email}！\n\n您的新密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請務必自行修改密碼。`);
+          document.getElementById('login-password').value = randomPwd;
+      } else {
+          alert(res.message);
+      }
     });
   }
 
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnSubmitReg = document.getElementById('btn-submit-reg');
   if (btnSubmitReg) {
-    btnSubmitReg.addEventListener('click', () => {
+    btnSubmitReg.addEventListener('click', async () => {
       const name = document.getElementById('reg-name').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
       const email = document.getElementById('reg-email').value.trim();
@@ -378,24 +378,25 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('請填寫完整姓名、電話與 Email！');
         return;
       }
-      if (usersDB[email]) {
-        alert('此 Email 已經註冊過囉，請直接使用密碼登入！');
-        document.getElementById('register-modal').classList.add('hidden');
-        document.getElementById('login-modal').classList.remove('hidden');
-        document.getElementById('login-email').value = email;
-        return;
-      }
-
-      const randomPwd = Math.random().toString(36).substring(2, 8);
-      usersDB[email] = { name, phone, password: randomPwd };
-      localStorage.setItem('coffee_users_db', JSON.stringify(usersDB));
-      alert(`【系統模擬】註冊成功，密碼已發送至 ${email}！\n\n您的初始密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請自行修改密碼。`);
+      if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
       
-      // 自動切換到登入 modal 並帶入參數
-      document.getElementById('register-modal').classList.add('hidden');
-      document.getElementById('login-modal').classList.remove('hidden');
-      document.getElementById('login-email').value = email;
-      document.getElementById('login-password').value = randomPwd;
+      const randomPwd = Math.random().toString(36).substring(2, 8);
+      const res = await window.firebaseDB.registerUser(email, name, phone, randomPwd);
+      if (res.success) {
+          alert(`【系統模擬】註冊成功，密碼已發送至 ${email}！\n\n您的初始密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請自行修改密碼。`);
+          // 自動切換到登入 modal 並帶入參數
+          document.getElementById('register-modal').classList.add('hidden');
+          document.getElementById('login-modal').classList.remove('hidden');
+          document.getElementById('login-email').value = email;
+          document.getElementById('login-password').value = randomPwd;
+      } else {
+          alert(res.message);
+          if(res.message.includes('已經註冊過')) {
+             document.getElementById('register-modal').classList.add('hidden');
+             document.getElementById('login-modal').classList.remove('hidden');
+             document.getElementById('login-email').value = email;
+          }
+      }
     });
   }
 
@@ -415,14 +416,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnSubmitPwd = document.getElementById('btn-submit-pwd');
   if (btnSubmitPwd) {
-    btnSubmitPwd.addEventListener('click', () => {
+    btnSubmitPwd.addEventListener('click', async () => {
       const newPwd = document.getElementById('new-password').value;
       if (newPwd && currentEmail) {
-        usersDB[currentEmail] = newPwd;
-        localStorage.setItem('coffee_users_db', JSON.stringify(usersDB));
-        alert('密碼修改成功！下次請使用新密碼登入。');
-        document.getElementById('password-modal').classList.add('hidden');
-        document.getElementById('new-password').value = '';
+        if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
+        const res = await window.firebaseDB.updatePassword(currentEmail, newPwd);
+        if (res.success) {
+            alert('密碼修改成功！下次請使用新密碼登入。');
+            document.getElementById('password-modal').classList.add('hidden');
+            document.getElementById('new-password').value = '';
+        } else {
+            alert('修改失敗，請稍後再試。');
+        }
       } else {
         alert('請輸入新密碼');
       }
