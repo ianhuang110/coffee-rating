@@ -21,13 +21,16 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
   // 改為 Network-First (網路優先) 策略，確保每次都抓最新檔案，失敗時才讀取快取
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        return caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, response.clone());
-          return response;
-        });
-      })
+      fetch(event.request)
+        .then(response => {
+          return caches.open(CACHE_NAME).then(cache => {
+            // 只有 GET 請求且為 http/https 協定才快取，避免擋住 Firebase 的資料庫連線
+            if (event.request.method === 'GET' && event.request.url.startsWith('http')) {
+                cache.put(event.request, response.clone());
+            }
+            return response;
+          });
+        })
       .catch(() => {
         return caches.match(event.request);
       })
