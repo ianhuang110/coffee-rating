@@ -276,16 +276,16 @@ function drawRadarChart(canvasId, label, stats) {
             maintainAspectRatio: false,
             scales: {
                 r: {
+                    min: 0,
+                    max: 5,
                     angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.2)' },
                     pointLabels: {
                         color: 'rgba(255, 255, 255, 0.7)',
                         font: { size: 12 }
                     },
                     ticks: {
                         display: false,
-                        min: 0,
-                        max: 5,
                         stepSize: 1
                     }
                 }
