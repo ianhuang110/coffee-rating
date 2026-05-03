@@ -135,5 +135,42 @@ window.firebaseDB = {
     },
     async updatePassword(email, newPassword) {
         return this.resetPassword(email, newPassword);
+    },
+    async getAllUsers() {
+        try {
+            const usersRef = ref(db, "users");
+            const snapshot = await get(usersRef);
+            const users = [];
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    data.id = childSnapshot.key;
+                    users.push(data);
+                });
+            }
+            return users;
+        } catch(e) {
+            console.error("讀取所有會員失敗:", e);
+            return [];
+        }
+    },
+    async getAllReviews() {
+        try {
+            const reviewsRef = ref(db, "reviews");
+            const snapshot = await get(reviewsRef);
+            const reviews = [];
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    data.id = childSnapshot.key;
+                    reviews.push(data);
+                });
+            }
+            // 排序：新的在前
+            return reviews.sort((a, b) => b.timestamp - a.timestamp);
+        } catch(e) {
+            console.error("讀取所有評論失敗:", e);
+            return [];
+        }
     }
 };
