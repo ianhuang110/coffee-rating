@@ -784,9 +784,6 @@ document.addEventListener('DOMContentLoaded', () => {
         card.style.setProperty('--top5-bg', 'transparent');
         card.style.setProperty('--top5-bg-hover', 'transparent');
         
-        // 隨機產生投票數營造社群感 (10~59K)
-        let randomVotes = Math.floor(Math.random() * 50) + 10; 
-        
         card.innerHTML = `
           <div class="top5-badge">#${index + 1}</div>
           <div class="top5-poster-wrap">
@@ -800,7 +797,6 @@ document.addEventListener('DOMContentLoaded', () => {
                  <div class="top5-score-box">
                     <span style="color:#f5c518; font-size:1.2rem;">★</span>
                     <span class="top5-score-val">${coffee.score.toFixed(1)}</span>
-                    <span class="top5-score-count">(${randomVotes}K)</span>
                  </div>
              </div>
           </div>
@@ -915,8 +911,6 @@ document.addEventListener('DOMContentLoaded', () => {
         card.style.setProperty('--top5-bg', 'transparent');
         card.style.setProperty('--top5-bg-hover', 'transparent');
         
-        let randomVotes = Math.floor(Math.random() * 50) + 10; 
-        
         card.innerHTML = `
           <div class="top5-badge" style="background:#cd6839;">精選</div>
           <div class="top5-poster-wrap">
@@ -930,7 +924,6 @@ document.addEventListener('DOMContentLoaded', () => {
                  <div class="top5-score-box">
                     <span style="color:#f5c518; font-size:1.2rem;">★</span>
                     <span class="top5-score-val">${coffee.score.toFixed(1)}</span>
-                    <span class="top5-score-count">(${randomVotes}K)</span>
                  </div>
              </div>
           </div>
