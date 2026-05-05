@@ -200,7 +200,7 @@ async function saveReview(coffeeId, text, stats, overallScore, imageUrls = []) {
 
 async function renderReviews(coffeeId) {
   const reviewsContainer = document.getElementById('reviews-list');
-  reviewsContainer.innerHTML = '<div style="text-align:center; padding: 2rem; color: #888;">正在載入評論...</div>';
+  reviewsContainer.innerHTML = '';
   
   const reviews = await getReviews(coffeeId);
   let dynamicStats = activeCoffeeObj ? activeCoffeeObj.stats.map(s => Math.round(s)) : [5,5,5,5,5];
@@ -256,16 +256,14 @@ async function renderReviews(coffeeId) {
             gridHtml += `<div class="rs-item"><span class="rs-label">${L}</span><div class="rs-val-text" style="font-size: 1.2rem; line-height: 1; margin-top: 2px;">${stars}</div></div>`;
         });
         
-        let scoreToDisplay = r.userAvg || r.avg || '-';
         scoreHtml = `
-          <div style="margin-bottom: 5px; display:flex; align-items:center;">
-            <strong style="color:var(--accent-gold); font-size: 1.2rem; border: 1px solid var(--accent-gold); padding: 4px 10px; border-radius:4px; margin-right: 15px;">${scoreToDisplay} / 10</strong> 
-          </div>
           <div class="review-stats-grid">
              ${gridHtml}
           </div>
         `;
       }
+      
+      let scoreToDisplay = r.userAvg || r.avg || '-';
       
       const author = r.user ? r.user : '訪客';
       let images = r.imageUrls || [];
@@ -286,7 +284,10 @@ async function renderReviews(coffeeId) {
         <div style="font-size:1.05rem; color:#555; line-height: 1.6; margin-bottom: 15px;">${r.text}</div>
         ${imgHtml}
         <div style="border-top: 1px dashed #eee; padding-top: 12px;">
-          <div style="font-size: 0.9rem; color: #888; margin-bottom: 8px;">您的評分紀錄:</div>
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 0.9rem; color: #888; margin-right: 15px;">您的評分紀錄:</div>
+            ${r.stats || r.userAvg || r.avg ? `<strong style="color:var(--accent-gold); font-size: 1.1rem; border: 1px solid var(--accent-gold); padding: 2px 8px; border-radius:4px;">${scoreToDisplay} / 10</strong>` : ''}
+          </div>
           ${scoreHtml}
         </div>
       `;
@@ -1021,14 +1022,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   // 初始化自訂豆子評分
-  let currentStars = [5, 5, 5, 5, 5];
+  let currentStars = [3, 3, 3, 3, 3];
   document.querySelectorAll('.stars').forEach(container => {
     const idx = parseInt(container.dataset.idx);
     container.innerHTML = '';
     for(let i=1; i<=5; i++){
       let s = document.createElement('span');
       s.textContent = '*';
-      s.className = 'star-icon active';
+      s.className = i <= 3 ? 'star-icon active' : 'star-icon';
+      if (i <= 3) s.style.color = 'var(--accent-gold)';
+      else s.style.color = '#ccc';
       s.dataset.val = i;
       s.addEventListener('click', () => {
         currentStars[idx] = i;
@@ -1147,9 +1150,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 重置
         overallIn.value = 8;
         if(overallVal) overallVal.textContent = 8;
-        currentStars = [5, 5, 5, 5, 5];
+        currentStars = [3, 3, 3, 3, 3];
         document.querySelectorAll('.stars').forEach((container) => {
-          updateStars(container, 5);
+          updateStars(container, 3);
         });
 
         selectedImageFiles = [];
