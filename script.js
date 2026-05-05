@@ -827,6 +827,130 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function renderDailyRandomCoffees() {
+    const dailyGrid = document.getElementById('daily-random-grid');
+    if (!dailyGrid) return;
+    
+    let allCoffees = [];
+    coffeeData.forEach(cafeObj => {
+       cafeObj.coffees.forEach(c => {
+           let country = c.name.split(' ')[0];
+           let baseScore = (c.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
+           allCoffees.push({
+               ...c,
+               country: country,
+               cafeName: cafeObj.cafe,
+               score: parseFloat(baseScore)
+           });
+       });
+    });
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    let dailySelectionIndices = [];
+    try {
+        const stored = localStorage.getItem('daily_random_selection');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed.date === todayStr && parsed.indices) {
+                dailySelectionIndices = parsed.indices;
+            }
+        }
+    } catch (e) {}
+    
+    if (dailySelectionIndices.length !== 10) {
+        let indices = Array.from(allCoffees.keys());
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        dailySelectionIndices = indices.slice(0, 10);
+        localStorage.setItem('daily_random_selection', JSON.stringify({
+            date: todayStr,
+            indices: dailySelectionIndices
+        }));
+    }
+    
+    const dailyCoffees = dailySelectionIndices.map(i => allCoffees[i % allCoffees.length]).filter(c => c);
+    
+    dailyGrid.innerHTML = '';
+    
+    dailyCoffees.forEach((coffee, index) => {
+        let posterMap = {
+            '衣索比亞': 'poster_ethiopia.png',
+            '肯亞': 'poster_ethiopia.png',
+            '盧安達': 'poster_ethiopia.png',
+            '蒲隆地': 'poster_ethiopia.png',
+            '哥倫比亞': 'poster_colombia.png',
+            '薩爾瓦多': 'poster_colombia.png',
+            '哥斯大黎加': 'poster_colombia.png',
+            '瓜地馬拉': 'poster_colombia.png',
+            '巴西': 'poster_colombia.png',
+            '宏都拉斯': 'poster_colombia.png',
+            '祕魯': 'poster_colombia.png',
+            '牙買加': 'poster_colombia.png',
+            '巴拿馬': 'poster_panama.png',
+            '印尼': 'poster_indonesia.png',
+            '葉門': 'poster_indonesia.png',
+            '台灣': 'poster_taiwan.png'
+        };
+        
+        let posterImg = 'coffee_poster.png';
+        
+        Object.keys(posterMap).forEach(key => {
+            if (coffee.name.includes(key)) posterImg = posterMap[key];
+        });
+        
+        const card = document.createElement('div');
+        card.className = 'top5-card';
+        card.style.setProperty('--top5-bg', 'transparent');
+        card.style.setProperty('--top5-bg-hover', 'transparent');
+        
+        let randomVotes = Math.floor(Math.random() * 50) + 10; 
+        
+        card.innerHTML = `
+          <div class="top5-badge" style="background:#cd6839;">精選</div>
+          <div class="top5-poster-wrap">
+             <img src="./${posterImg}" class="top5-poster" alt="poster">
+             <div class="top5-poster-overlay"></div>
+          </div>
+          <div class="top5-info">
+             <div class="top5-name">${coffee.name}</div>
+             <div class="top5-meta">${coffee.cafeName} • 原豆單品</div>
+             <div class="top5-rate-row">
+                 <div class="top5-score-box">
+                    <span style="color:#f5c518; font-size:1.2rem;">★</span>
+                    <span class="top5-score-val">${coffee.score.toFixed(1)}</span>
+                    <span class="top5-score-count">(${randomVotes}K)</span>
+                 </div>
+             </div>
+          </div>
+        `;
+        
+        card.addEventListener('click', () => {
+            showCoffeeDetails(coffee.cafeName, coffee);
+            const sidebarItem = document.querySelector(`.coffee-item[data-id="${coffee.id}"]`);
+            if(sidebarItem) {
+                const countryList = sidebarItem.closest('.country-list');
+                if (countryList) {
+                    countryList.classList.add('open');
+                    if (countryList.previousElementSibling) countryList.previousElementSibling.classList.add('open');
+                }
+                const contBody = sidebarItem.closest('.continent-body');
+                if (contBody) {
+                    contBody.classList.add('open');
+                    if (contBody.previousElementSibling) contBody.previousElementSibling.classList.add('open');
+                }
+                sidebarItem.click();
+                setTimeout(() => {
+                    sidebarItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        });
+        
+        dailyGrid.appendChild(card);
+    });
+  }
+
   // 初始渲染
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get('search');
@@ -847,6 +971,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // 渲染 Top 5 排行榜
   renderTop5Coffees();
+  
+  // 渲染 每日隨機精選
+  renderDailyRandomCoffees();
 
   // 綁定搜尋輸入
   if (searchInput) {
