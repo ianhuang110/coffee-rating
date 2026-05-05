@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getDatabase, ref, push, get, child, query, orderByChild, equalTo, set, update } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBzVPkkUUlfiJGvUetJbe5Nf3yCjYraOUo",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const storage = getStorage(app);
 
 window.firebaseDB = {
     async getReviews(coffeeId) {
@@ -35,7 +37,19 @@ window.firebaseDB = {
             return [];
         }
     },
-    async saveReview(coffeeId, text, stats, overallScore, userName) {
+    async uploadReviewImage(file) {
+        try {
+            const fileName = `reviews/${Date.now()}_${file.name}`;
+            const fileRef = storageRef(storage, fileName);
+            const snapshot = await uploadBytes(fileRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            return downloadURL;
+        } catch(e) {
+            console.error("上傳照片失敗:", e);
+            return null;
+        }
+    },
+    async saveReview(coffeeId, text, stats, overallScore, userName, imageUrl = null) {
         try {
             const now = new Date();
             const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
@@ -49,6 +63,7 @@ window.firebaseDB = {
                 date: dateStr,
                 stats: stats,
                 userAvg: overallScore,
+                imageUrl: imageUrl,
                 timestamp: Date.now()
             });
             return true;

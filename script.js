@@ -188,15 +188,13 @@ async function getReviews(coffeeId) {
   }
 }
 
-async function saveReview(coffeeId, text, stats, overallScore) {
+async function saveReview(coffeeId, text, stats, overallScore, imageUrls = []) {
   const userName = currentUser ? currentUser : '訪客';
   
-  // 新增 Firebase 版的紀錄
   if (window.firebaseDB) {
-      await window.firebaseDB.saveReview(coffeeId, text, stats, overallScore, userName);
+      await window.firebaseDB.saveReview(coffeeId, text, stats, overallScore, userName, imageUrls);
   }
   
-  // 重新從 DB 拉取並渲染
   await renderReviews(coffeeId);
 }
 
@@ -270,12 +268,23 @@ async function renderReviews(coffeeId) {
       }
       
       const author = r.user ? r.user : '訪客';
+      let images = r.imageUrls || [];
+      if (r.imageUrl && images.length === 0) images = [r.imageUrl]; // 向後相容
+      let imgHtml = '';
+      if (images.length > 0) {
+          imgHtml = '<div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px;">';
+          images.forEach(url => {
+              imgHtml += `<img src="${url}" alt="review image" style="max-height: 120px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">`;
+          });
+          imgHtml += '</div>';
+      }
       item.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
           <strong style="color:#333; font-size:1.1rem; border-left: 3px solid var(--accent-gold); padding-left:8px;">${author}</strong>
           <span style="color:#888; font-size:0.85rem;">[${r.date}]</span>
         </div>
         <div style="font-size:1.05rem; color:#555; line-height: 1.6; margin-bottom: 15px;">${r.text}</div>
+        ${imgHtml}
         <div style="border-top: 1px dashed #eee; padding-top: 12px;">
           <div style="font-size: 0.9rem; color: #888; margin-bottom: 8px;">您的評分紀錄:</div>
           ${scoreHtml}
@@ -1041,7 +1050,73 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  reviewForm.addEventListener('submit', (e) => {
+  let selectedImageFiles = [];
+  const reviewImageInput = document.getElementById('review-image');
+  const reviewImagePreview = document.getElementById('review-image-preview');
+
+  function updateImagePreviews() {
+      if (!reviewImagePreview) return;
+      reviewImagePreview.innerHTML = '';
+      if (selectedImageFiles.length === 0) {
+          reviewImagePreview.style.display = 'none';
+          return;
+      }
+      reviewImagePreview.style.display = 'flex';
+      selectedImageFiles.forEach((file, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.style.position = 'relative';
+          wrapper.style.display = 'inline-block';
+          
+          const img = document.createElement('img');
+          img.style.maxHeight = '100px';
+          img.style.borderRadius = '4px';
+          img.style.border = '1px solid #ddd';
+          
+          const reader = new FileReader();
+          reader.onload = (ev) => img.src = ev.target.result;
+          reader.readAsDataURL(file);
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.innerHTML = '&times;';
+          removeBtn.style.position = 'absolute';
+          removeBtn.style.top = '-5px';
+          removeBtn.style.right = '-5px';
+          removeBtn.style.background = 'rgba(255,0,0,0.8)';
+          removeBtn.style.color = '#fff';
+          removeBtn.style.border = 'none';
+          removeBtn.style.borderRadius = '50%';
+          removeBtn.style.width = '20px';
+          removeBtn.style.height = '20px';
+          removeBtn.style.cursor = 'pointer';
+          removeBtn.style.fontSize = '12px';
+          removeBtn.style.display = 'flex';
+          removeBtn.style.alignItems = 'center';
+          removeBtn.style.justifyContent = 'center';
+          
+          removeBtn.addEventListener('click', () => {
+              selectedImageFiles.splice(index, 1);
+              updateImagePreviews();
+          });
+          
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+          reviewImagePreview.appendChild(wrapper);
+      });
+  }
+
+  if (reviewImageInput) {
+    reviewImageInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length > 0) {
+        selectedImageFiles = selectedImageFiles.concat(files);
+        updateImagePreviews();
+        reviewImageInput.value = ''; // Reset input to allow adding same file again if wanted
+      }
+    });
+  }
+
+  reviewForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const input = document.getElementById('review-input');
     const text = input.value.trim();
@@ -1049,8 +1124,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (text && activeCoffeeId) {
       try {
+        const btn = document.querySelector('#btn-submit-review') || document.querySelector('.btn-submit');
+        let originalText = '送出評論';
+        if (btn) {
+           originalText = btn.textContent;
+           btn.textContent = "上傳中...";
+           btn.disabled = true;
+           btn.style.opacity = '0.7';
+        }
+
+        let imageUrls = [];
+        if (selectedImageFiles.length > 0 && window.firebaseDB) {
+            const uploadPromises = selectedImageFiles.map(file => window.firebaseDB.uploadReviewImage(file));
+            const results = await Promise.all(uploadPromises);
+            imageUrls = results.filter(url => url !== null);
+        }
+
         // 複製一份陣列儲存
-        saveReview(activeCoffeeId, text, [...currentStars], overallScore);
+        await saveReview(activeCoffeeId, text, [...currentStars], overallScore, imageUrls);
         input.value = '';
         
         // 重置
@@ -1060,23 +1151,34 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.stars').forEach((container) => {
           updateStars(container, 5);
         });
+
+        selectedImageFiles = [];
+        updateImagePreviews();
         
+        if (btn) {
+           btn.textContent = originalText;
+           btn.disabled = false;
+           btn.style.opacity = '1';
+        }
+
         // 依照要求跳出視窗
         alert('已送出!謝謝');
         // 送出後關閉評論視窗
         document.getElementById('reviews-modal').classList.add('hidden');
       } catch(err) {
         console.error('儲存評論時發生錯誤:', err);
-        const btn = document.querySelector('.btn-submit');
+        const btn = document.querySelector('#btn-submit-review') || document.querySelector('.btn-submit');
         if (btn) {
           const originalText = btn.textContent;
           btn.textContent = '❌ ' + (err.message || '發生錯誤');
           btn.style.backgroundColor = '#f44336';
           btn.style.color = '#fff';
           setTimeout(() => {
-            btn.textContent = originalText;
+            btn.textContent = '送出評論';
             btn.style.backgroundColor = '';
             btn.style.color = '';
+            btn.disabled = false;
+            btn.style.opacity = '1';
           }, 4000);
         } else {
           alert('發生錯誤：' + err.message);
