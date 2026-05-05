@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 依分數高低排序，取最前面 5 名
     allCoffees.sort((a,b) => b.score - a.score);
-    const top5 = allCoffees.slice(0, 5);
+    const top5 = allCoffees.slice(0, 10);
     
     top5Grid.innerHTML = '';
     
@@ -771,8 +771,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const card = document.createElement('div');
         card.className = 'top5-card';
-        card.style.setProperty('--top5-bg', bgGrad);
-        card.style.setProperty('--top5-bg-hover', bgGradHover);
+        card.style.setProperty('--top5-bg', 'transparent');
+        card.style.setProperty('--top5-bg-hover', 'transparent');
         
         // 隨機產生投票數營造社群感 (10~59K)
         let randomVotes = Math.floor(Math.random() * 50) + 10; 
@@ -792,13 +792,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="top5-score-val">${coffee.score.toFixed(1)}</span>
                     <span class="top5-score-count">(${randomVotes}K)</span>
                  </div>
-                 <div class="top5-action" style="margin-left: auto;">
-                    <span style="color:#57a3e8;">☆</span> Rate
-                 </div>
-             </div>
-             <div class="top5-action" style="margin-top:0;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>
-                View Details
              </div>
           </div>
         `;
