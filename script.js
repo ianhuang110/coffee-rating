@@ -1009,6 +1009,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 移除單品下的店家搜尋註冊
   
+  const btnOpenMap = document.getElementById('btn-open-map');
+  if (btnOpenMap) {
+      btnOpenMap.addEventListener('click', () => {
+          if (activeCoffeeObj && currentCoffeeStores.length > 0) {
+              const posterImg = document.querySelector('.imdb-poster img');
+              localStorage.setItem('mapHighlightCoffee', JSON.stringify({
+                  name: activeCoffeeObj.name,
+                  cafes: currentCoffeeStores.map(c => c.cafe),
+                  poster: posterImg ? posterImg.src : 'coffee_poster.png'
+              }));
+          } else {
+              localStorage.removeItem('mapHighlightCoffee');
+          }
+          window.location.href = 'map.html';
+      });
+  }
+
   // 評論表單事件
   const reviewForm = document.getElementById('review-form');
   

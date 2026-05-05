@@ -23,18 +23,31 @@ const cafeCoordinates = {
       maxZoom: 20
   }).addTo(map);
   
+  const highlightData = localStorage.getItem('mapHighlightCoffee');
+  let targetCoffee = null;
+  if (highlightData) {
+      try {
+          targetCoffee = JSON.parse(highlightData);
+          localStorage.removeItem('mapHighlightCoffee');
+      } catch(e) {}
+  }
+
   const mapBounds = L.latLngBounds();
+  const targetCoords = [];
   
   Object.keys(cafeCoordinates).forEach(cafe => {
       const coords = cafeCoordinates[cafe];
       mapBounds.extend(coords);
       
+      const isTarget = targetCoffee && targetCoffee.cafes.includes(cafe);
+      if (isTarget) targetCoords.push(coords);
+      
       const marker = L.circleMarker(coords, {
           color: '#ffffff',
-          fillColor: '#e74c3c',
-          fillOpacity: 0.9,
-          radius: 10,
-          weight: 3
+          fillColor: isTarget ? '#e74c3c' : (targetCoffee ? '#aaaaaa' : '#e74c3c'),
+          fillOpacity: isTarget ? 1.0 : (targetCoffee ? 0.6 : 0.9),
+          radius: isTarget ? 10 : (targetCoffee ? 6 : 10),
+          weight: isTarget ? 3 : (targetCoffee ? 1 : 3)
       }).addTo(map);
       
       marker.bindPopup(`<b>${cafe}</b>`);
@@ -52,6 +65,69 @@ const cafeCoordinates = {
       });
   });
   
-  if (mapBounds.isValid()) {
+  if (targetCoffee && targetCoords.length > 0) {
+      let centerLat = 0, centerLng = 0;
+      targetCoords.forEach(c => {
+          centerLat += c[0];
+          centerLng += c[1];
+      });
+      centerLat /= targetCoords.length;
+      centerLng /= targetCoords.length;
+      
+      // 稍微將縮圖放到偏上方
+      const posterCenter = [centerLat + 0.15, centerLng];
+      
+      // 畫指引線
+      targetCoords.forEach(c => {
+          L.polyline([posterCenter, c], {
+              color: '#cda25b',
+              weight: 2,
+              opacity: 0.8,
+              dashArray: '5, 5'
+          }).addTo(map);
+      });
+      
+      // 顯示縮圖
+      const posterIcon = L.divIcon({
+          className: 'coffee-poster-icon',
+          html: `<div style="
+              width: 80px; 
+              height: 110px; 
+              background-image: url('${targetCoffee.poster}'); 
+              background-size: cover; 
+              background-position: center; 
+              border: 2px solid #cda25b; 
+              border-radius: 8px; 
+              box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+              position: relative;">
+              <div style="
+                  position: absolute; 
+                  bottom: 0; 
+                  left: 0; 
+                  right: 0; 
+                  background: rgba(0,0,0,0.7); 
+                  color: white; 
+                  font-size: 10px; 
+                  text-align: center; 
+                  padding: 2px; 
+                  border-bottom-left-radius: 6px; 
+                  border-bottom-right-radius: 6px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;">
+                  ${targetCoffee.name}
+              </div>
+          </div>`,
+          iconSize: [80, 110],
+          iconAnchor: [40, 55]
+      });
+      
+      L.marker(posterCenter, { icon: posterIcon, interactive: false }).addTo(map);
+      
+      // 讓地圖對焦在這些目標和縮圖上
+      const targetBounds = L.latLngBounds(targetCoords);
+      targetBounds.extend(posterCenter);
+      map.fitBounds(targetBounds, { padding: [80, 80] });
+  } else if (mapBounds.isValid()) {
       map.fitBounds(mapBounds, { padding: [50, 50] });
   }
