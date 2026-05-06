@@ -45,7 +45,14 @@ const zhToEn = {
     "請從清單選擇一款感興趣的咖啡豆，查看詳細的風味雷達圖、網友評論推薦店家。": "Choose a coffee from the list to view its flavor radar, reviews, and stores.",
     "請": "Please",
     "登入會員": "Login",
-    "以發表評分與留言": "to post rating and comment"
+    "以發表評分與留言": "to post rating and comment",
+    "請輸入姓名": "Enter Name",
+    "請輸入電話號碼": "Enter Phone",
+    "請輸入新密碼": "Enter New Password",
+    "請輸入 Email": "Enter Email",
+    "請輸入密碼": "Enter Password",
+    "寫下您對這支豆子的風味感受...": "Share your thoughts...",
+    "Search 單品咖啡": "Search Coffee"
 };
 
 const coffeeVocabZhToEn = {
@@ -215,22 +222,6 @@ function translateTextNode(node) {
                 let mapToUse = currentLang === 'en' ? zhToEn : enToZh;
                 if (mapToUse[node.placeholder]) {
                     node.placeholder = mapToUse[node.placeholder];
-                } else if (currentLang === 'en' && node.placeholder === 'Search 單品咖啡') {
-                    node.placeholder = 'Search Coffee';
-                } else if (currentLang === 'zh' && node.placeholder === 'Search Coffee') {
-                    node.placeholder = 'Search 單品咖啡';
-                } else if (currentLang === 'en' && node.placeholder === '請輸入 Email') {
-                    node.placeholder = 'Enter Email';
-                } else if (currentLang === 'zh' && node.placeholder === 'Enter Email') {
-                    node.placeholder = '請輸入 Email';
-                } else if (currentLang === 'en' && node.placeholder === '請輸入密碼') {
-                    node.placeholder = 'Enter Password';
-                } else if (currentLang === 'zh' && node.placeholder === 'Enter Password') {
-                    node.placeholder = '請輸入密碼';
-                } else if (currentLang === 'en' && node.placeholder === '寫下您對這支豆子的風味感受...') {
-                    node.placeholder = 'Share your thoughts...';
-                } else if (currentLang === 'zh' && node.placeholder === 'Share your thoughts...') {
-                    node.placeholder = '寫下您對這支豆子的風味感受...';
                 }
             }
             for (let i = 0; i < node.childNodes.length; i++) {
