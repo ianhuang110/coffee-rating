@@ -801,8 +801,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Logo 回首頁功能
   const logoBtn = document.querySelector('.logo');
+  function closeCoffeeDetailsUI() {
+      const detailsCard = document.getElementById('coffee-details');
+      if (detailsCard) detailsCard.classList.add('hidden');
+      const placeholder = document.getElementById('welcome-placeholder');
+      if (placeholder) placeholder.classList.remove('hidden');
+      document.querySelectorAll('.coffee-item').forEach(el => el.classList.remove('active'));
+      const searchInput = document.getElementById('search-input');
+      if (searchInput && typeof renderCafeList === 'function') {
+        searchInput.value = '';
+        renderCafeList(''); 
+      }
+      activeCoffeeId = null;
+      activeCoffeeObj = null;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  window.addEventListener('popstate', (e) => {
+      if (window.location.hash !== '#details') {
+          closeCoffeeDetailsUI();
+      }
+  });
   if (logoBtn) {
-    logoBtn.addEventListener('click', () => {
+    logoBtn.addEventListener('click', () => { if (window.location.hash === '#details') { history.back(); return; }
       // 隱藏詳細資訊
       const detailsCard = document.getElementById('coffee-details');
       if (detailsCard) detailsCard.classList.add('hidden');
@@ -897,7 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 手機版詳細視窗關閉按鈕
   const btnCloseDetails = document.getElementById('btn-close-details');
   if (btnCloseDetails) {
-    btnCloseDetails.addEventListener('click', () => {
+    btnCloseDetails.addEventListener('click', () => { if (window.location.hash === '#details') { history.back(); return; }
       document.getElementById('coffee-details').classList.add('hidden');
       
       const placeholder = document.getElementById('welcome-placeholder');
@@ -1540,6 +1561,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showCoffeeDetails(cafeName, coffee) {
+  if (window.history && window.history.pushState && window.location.hash !== '#details') {
+      history.pushState({ page: 'details' }, '', '#details');
+  }
   activeCoffeeId = coffee.id;
   activeCoffeeObj = coffee;
   
