@@ -100,7 +100,7 @@ const coffeeVocabZhToEn = {
     "單一莊園": "Single Estate",
     "微批次": "Micro Lot",
     "原豆單品": "Single Origin",
-    "請從清單選擇一款感興趣的咖啡豆，": "Choose a coffee from the list, ",
+    "請從清單選擇一款感興趣的咖啡豆，": "Choose a coffee from the list,",
     "查看詳細的風味雷達圖、網友評論推薦店家。": "view its flavor radar, reviews, and stores.",
     "桃園市": "Taoyuan City",
     "台北市": "Taipei City",
