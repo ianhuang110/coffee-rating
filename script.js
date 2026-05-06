@@ -1,3 +1,256 @@
+const zhToEn = {
+    "會員登入": "Login",
+    "更改密碼": "Change Pwd",
+    "登出": "Logout",
+    "取消": "Cancel",
+    "登入": "Login",
+    "忘記密碼？": "Forgot Password?",
+    "還不是會員？點此註冊": "Register Here",
+    "輸入新密碼": "Enter new password",
+    "確認更改": "Confirm",
+    "註冊會員": "Register",
+    "姓名 (必填)": "Name (Required)",
+    "電話 (必填)": "Phone (Required)",
+    "Email (必填)": "Email (Required)",
+    "註冊並發送密碼": "Register & Send Pwd",
+    "撰寫您的評論": "Write Review",
+    "撰寫評論": "Write Review",
+    "總評(1-10)": "Overall(1-10)",
+    "香氣": "Aroma",
+    "酸度": "Acidity",
+    "甜度": "Sweetness",
+    "厚度": "Body",
+    "餘韻": "Aftertaste",
+    "上傳照片 (選填)": "Upload Photos(Opt)",
+    "送出評論": "Submit",
+    "請先登入以享受完整功能": "Login for full features",
+    "單品咖啡指南": "Single Origin Guide",
+    "前十大咖啡評分": "Top 10 Coffee Ratings",
+    "您的專屬精選": "Your Daily Picks",
+    "綜合評分": "Score",
+    "風味雷達圖": "Flavor Radar",
+    "風味簡介": "Flavor Profile",
+    "供應門市": "Available at",
+    "目前還沒有評論，成為第一個留下心得的人吧！": "No reviews yet. Be the first!",
+    "精選": "Featured",
+    "原豆單品": "Single Origin",
+    "非洲": "Africa",
+    "中南美洲": "Latin America",
+    "亞洲": "Asia",
+    "其他": "Other",
+    "暫無紀錄": "No records",
+    "客戶評論": "Customer Reviews",
+    "請選擇一款咖啡": "Please select a coffee",
+    "探索單品咖啡": "Explore Single Origins",
+    "請從清單選擇一款感興趣的咖啡豆，查看詳細的風味雷達圖、網友評論推薦店家。": "Choose a coffee from the list to view its flavor radar, reviews, and stores.",
+    "請": "Please",
+    "登入會員": "Login",
+    "以發表評分與留言": "to post rating and comment"
+};
+
+const coffeeVocabZhToEn = {
+    "巴拿馬": "Panama",
+    "衣索比亞": "Ethiopia",
+    "哥倫比亞": "Colombia",
+    "肯亞": "Kenya",
+    "瓜地馬拉": "Guatemala",
+    "薩爾瓦多": "El Salvador",
+    "哥斯大黎加": "Costa Rica",
+    "巴西": "Brazil",
+    "宏都拉斯": "Honduras",
+    "祕魯": "Peru",
+    "牙買加": "Jamaica",
+    "印尼": "Indonesia",
+    "葉門": "Yemen",
+    "台灣": "Taiwan",
+    "盧安達": "Rwanda",
+    "蒲隆地": "Burundi",
+    "翡翠莊園": "Esmeralda",
+    "耶加雪菲": "Yirgacheffe",
+    "西達摩": "Sidamo",
+    "塔拉珠": "Tarrazu",
+    "喜拉朵": "Cerrado",
+    "蘇門答臘": "Sumatra",
+    "塔瓦湖": "Lake Tawar",
+    "曼特寧": "Mandheling",
+    "藍山": "Blue Mountain",
+    "薇薇特南果": "Huehuetenango",
+    "帕卡瑪拉": "Pacamara",
+    "粉紅波旁": "Pink Bourbon",
+    "波旁": "Bourbon",
+    "鐵比卡": "Typica",
+    "卡杜拉": "Caturra",
+    "藝伎": "Geisha",
+    "水洗": "Washed",
+    "日曬": "Natural",
+    "蜜處理": "Honey",
+    "厭氧": "Anaerobic",
+    "雙重厭氧": "Double Anaerobic",
+    "谷吉": "Guji",
+    "罕貝拉": "Hambela",
+    "烏拉嘎": "Uraga",
+    "玫瑰谷": "Rose Valley",
+    "原生種": "Heirloom",
+    "冽里": "Nyeri",
+    "涅里": "Nyeri",
+    "阿里山": "Alishan",
+    "特等獎": "First Prize",
+    "頭等獎": "Top Prize",
+    "黑蜜處理": "Black Honey",
+    "單一莊園": "Single Estate",
+    "微批次": "Micro Lot",
+    "原豆單品": "Single Origin",
+    "請從清單選擇一款感興趣的咖啡豆，": "Choose a coffee from the list, ",
+    "查看詳細的風味雷達圖、網友評論推薦店家。": "view its flavor radar, reviews, and stores.",
+    "桃園市": "Taoyuan City",
+    "台北市": "Taipei City",
+    "新竹市": "Hsinchu City",
+    "台中市": "Taichung City",
+    "台南市": "Tainan City",
+    "高雄市": "Kaohsiung City",
+    "淺焙": "Light Roast",
+    "中焙": "Medium Roast",
+    "中深焙": "Medium-Dark Roast",
+    "深焙": "Dark Roast",
+    "半洗": "Semi-Washed",
+    "厭氧發酵處理": "Anaerobic Fermentation",
+    "薇拉": "Huila",
+    "摩卡": "Mocha",
+    "馬塔里": "Mattari",
+    "馬塔利": "Mattari",
+    "庇護所莊園": "El Refugio Estate",
+    "音樂家系列": "Musician Series",
+    "莫札特": "Mozart",
+    "穆莎莎": "Musasa",
+    "查卡馬": "Chacama",
+    "厚實度": "Body",
+    "世界冠軍級別的優雅茉莉花香、佛手柑與極致乾淨的口感。": "World-class elegant jasmine aroma, bergamot, and extremely clean taste.",
+    "濃郁的草莓果醬、水蜜桃甜感與熱情奔放的熱帶水果香。": "Rich strawberry jam, peach sweetness, and vibrant tropical fruit aromas.",
+    "明亮的黑醋栗、小番茄風味，口感厚實醇淨。": "Bright blackcurrant and cherry tomato flavors, full-bodied and clean.",
+    "柔和的榛果、烤蘋果與蜂蜜甜潤，相當平衡。": "Soft hazelnut, baked apple, and honey sweetness, very balanced.",
+    "奔放的莓果香氣與柑橘酸質，口感乾淨清新。": "Vibrant berry aromas with citrus acidity, clean and refreshing.",
+    "濃烈厚實的黑巧克力、草藥與木質調，幾乎無酸。": "Intense dark chocolate, herbal and woody notes, almost no acidity.",
+    "甜美櫻桃、覆盆子明亮酸值，乾淨多汁。": "Sweet cherry, bright raspberry acidity, clean and juicy.",
+    "經典細緻花香、烤核桃焦糖甜感。": "Classic delicate floral aroma, roasted walnut and caramel sweetness.",
+    "渾厚的烏梅、小番茄風味，明亮酸質。": "Rich dark plum and cherry tomato flavors, bright acidity.",
+    "極致平衡，溫和的堅果、可可甜與無負擔的滑順口感。": "Extremely balanced, mild nutty and cocoa sweetness with a smooth mouthfeel.",
+    "極度張揚的水蜜桃、草莓乳酸與馥郁的玫瑰花香。": "Highly expressive peach, strawberry lactic acid, and rich rose floral aroma.",
+    "玫瑰花、草莓果醬、甚至有些微酒香發酵味。": "Rose, strawberry jam, and even a slight winey fermented note.",
+    "優雅的白花香，柳橙與檸檬酸值。": "Elegant white floral aroma, orange and lemon acidity.",
+    "乾淨醇厚，帶有梅子、深色莓果的調性。": "Clean and full-bodied, with plum and dark berry notes.",
+    "奶油、太妃糖柔滑口感與無花果甜香。": "Creamy, toffee-like smooth mouthfeel with fig sweetness.",
+    "獨特高山茶韻，帶有蜜香與細緻李子酸甜。": "Unique high mountain tea notes, with honey aroma and delicate plum sweet-tartness.",
+    "柳橙、堅果、鮮明的焦糖尾韻。": "Orange, nuts, with a distinct caramel finish.",
+    "溫和低酸，充滿花生、核桃與淡淡的黑糖甜。": "Mild and low acidity, full of peanut, walnut, and a hint of brown sugar sweetness.",
+    "乾淨明亮的檸檬酸值與白花香氣。": "Clean and bright lemon acidity with white floral aroma.",
+    "濃郁的黑巧克力、焦糖與厚實黏稠的口感。": "Rich dark chocolate, caramel, and a thick, syrupy mouthfeel.",
+    "柑橘酸值明亮，尾韻帶有深焙太妃糖甜感。": "Bright citrus acidity with a deep-roasted toffee sweetness in the finish.",
+    "深色莓果與葡萄乾氣息，糖漿般的濃郁。": "Dark berry and raisin aromas, syrupy richness.",
+    "豐富的熱帶水果與奔放的酒香感。": "Rich tropical fruits and a vibrant winey sensation.",
+    "帶著鮮明白酒香氣、肉桂與蘋果派的獨特風味。": "Distinct white wine aroma, cinnamon, and unique apple pie flavor.",
+    "溫和流淌的杏仁、奶油口感，甜度極佳。": "Smoothly flowing almond and creamy mouthfeel, excellent sweetness.",
+    "傳統日曬的狂野香料、菸草、紅酒發酵氣息。": "Wild spices, tobacco, and red wine fermented aromas of traditional naturals.",
+    "花香、柑橘、紅茶感，整體輕盈乾淨。": "Floral, citrus, and black tea notes, overall light and clean.",
+    "紅蘋果明亮酸質，焦糖回甘與細緻柔和的口感。": "Bright red apple acidity, caramel aftertaste, and delicate soft mouthfeel.",
+    "Simple Kaffa 興波咖啡": "Simple Kaffa",
+    "豆舖咖啡館": "Doupu Cafe",
+    "SIDRA 栖爪咖啡": "SIDRA Coffee",
+    "ML coffee 慕光咖啡工作室": "ML Coffee Studio",
+    "著手咖啡 Coffee Intro (中壢內壢店)": "Coffee Intro (Neili)",
+    "著手咖啡 Coffee Intro": "Coffee Intro",
+    "拾事咖啡 SEIZE THE DAY": "SEIZE THE DAY",
+    "暖空咖啡 Warm air Kafe": "Warm air Kafe",
+    "墨咖啡 Ink Coffee": "Ink Coffee",
+    "存憶 Cafe Bar": "Cunyi Cafe Bar",
+    "馤咖啡。食作": "Ai Cafe"
+};
+
+const coffeeVocabEnToZh = {};
+for (let key in coffeeVocabZhToEn) {
+    coffeeVocabEnToZh[coffeeVocabZhToEn[key]] = key;
+}
+
+const enToZh = {};
+for (let key in zhToEn) {
+    enToZh[zhToEn[key]] = key;
+}
+
+let currentLang = localStorage.getItem('site_lang') || 'zh';
+
+function translateTextNode(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+        let text = node.nodeValue.trim();
+        if (!text) return;
+        
+        let mapToUse = currentLang === 'en' ? zhToEn : enToZh;
+        
+        if (mapToUse[text]) {
+            node.nodeValue = node.nodeValue.replace(text, mapToUse[text]);
+            return;
+        }
+        
+        let newText = text;
+        
+        if (currentLang === 'en' && newText.startsWith('歡迎，')) {
+             newText = newText.replace('歡迎，', 'Welcome, ');
+        } else if (currentLang === 'zh' && newText.startsWith('Welcome, ')) {
+             newText = newText.replace('Welcome, ', '歡迎，');
+        }
+        
+        let vocabMap = currentLang === 'en' ? coffeeVocabZhToEn : coffeeVocabEnToZh;
+        let keys = Object.keys(vocabMap).sort((a,b) => b.length - a.length);
+        for (let k of keys) {
+            if (newText.includes(k)) {
+                newText = newText.split(k).join(vocabMap[k]);
+            }
+        }
+        
+        if (newText !== text) {
+            node.nodeValue = newText;
+        }
+        
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
+            if (node.placeholder) {
+                let mapToUse = currentLang === 'en' ? zhToEn : enToZh;
+                if (mapToUse[node.placeholder]) {
+                    node.placeholder = mapToUse[node.placeholder];
+                } else if (currentLang === 'en' && node.placeholder === 'Search 單品咖啡') {
+                    node.placeholder = 'Search Coffee';
+                } else if (currentLang === 'zh' && node.placeholder === 'Search Coffee') {
+                    node.placeholder = 'Search 單品咖啡';
+                } else if (currentLang === 'en' && node.placeholder === '請輸入 Email') {
+                    node.placeholder = 'Enter Email';
+                } else if (currentLang === 'zh' && node.placeholder === 'Enter Email') {
+                    node.placeholder = '請輸入 Email';
+                } else if (currentLang === 'en' && node.placeholder === '請輸入密碼') {
+                    node.placeholder = 'Enter Password';
+                } else if (currentLang === 'zh' && node.placeholder === 'Enter Password') {
+                    node.placeholder = '請輸入密碼';
+                } else if (currentLang === 'en' && node.placeholder === '寫下您對這支豆子的風味感受...') {
+                    node.placeholder = 'Share your thoughts...';
+                } else if (currentLang === 'zh' && node.placeholder === 'Share your thoughts...') {
+                    node.placeholder = '寫下您對這支豆子的風味感受...';
+                }
+            }
+            for (let i = 0; i < node.childNodes.length; i++) {
+                translateTextNode(node.childNodes[i]);
+            }
+        }
+    }
+}
+
+window.applyTranslation = function() {
+    translateTextNode(document.body);
+    const langSelect = document.getElementById('lang-select');
+    if (langSelect) {
+        langSelect.value = currentLang;
+    }
+    if (typeof activeCoffeeObj !== 'undefined' && activeCoffeeObj && window.lastDynamicStats && typeof renderRadarChart === 'function') {
+        renderRadarChart(activeCoffeeObj.name, window.lastDynamicStats);
+    }
+};
+
 // 會員系統模擬
 let currentUser = localStorage.getItem('coffee_user') || null;
 let currentEmail = localStorage.getItem('coffee_email') || null;
@@ -26,6 +279,7 @@ function renderAuth() {
     if (reviewForm) reviewForm.style.display = 'none';
     if (loginPrompt) loginPrompt.style.display = 'block';
   }
+  if (window.applyTranslation) window.applyTranslation();
 }
 
 // 咖啡資料庫
@@ -580,6 +834,7 @@ async function renderReviews(coffeeId) {
   
   // 以動態五感驅動雷達圖
   if (activeCoffeeObj) {
+     window.lastDynamicStats = dynamicStats;
      renderRadarChart(activeCoffeeObj.name, dynamicStats);
   }
   
@@ -641,11 +896,21 @@ async function renderReviews(coffeeId) {
       reviewsContainer.appendChild(item);
     });
   }
+  if (window.applyTranslation) window.applyTranslation();
 }
 
 // 初始化 DOM
 document.addEventListener('DOMContentLoaded', () => {
-    
+
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect) {
+      langSelect.addEventListener('change', (e) => {
+          currentLang = e.target.value;
+          localStorage.setItem('site_lang', currentLang);
+          window.applyTranslation();
+      });
+  }
+
   // 初始化 Auth UI
   renderAuth();
   
@@ -1064,6 +1329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cafeListContainer.appendChild(contDiv);
       }
     });
+    if (window.applyTranslation) window.applyTranslation();
   }
 
   function renderTop5Coffees() {
@@ -1193,6 +1459,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         top5Grid.appendChild(card);
     });
+    if (window.applyTranslation) window.applyTranslation();
   }
 
   function renderDailyRandomCoffees() {
@@ -1311,6 +1578,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         dailyGrid.appendChild(card);
     });
+    if (window.applyTranslation) window.applyTranslation();
   }
 
   // 初始渲染
@@ -1657,6 +1925,7 @@ function showCoffeeDetails(cafeName, coffee) {
   
   // renderReviews 裡會同時處理計算與顯示總平均分與雷達圖重生
   renderReviews(coffee.id);
+  if (window.applyTranslation) window.applyTranslation();
 }
 
 function renderRadarChart(coffeeName, stats) {
@@ -1670,14 +1939,14 @@ function renderRadarChart(coffeeName, stats) {
   const chLabels = ['香氣', '酸度', '甜度', '厚度', '餘韻'];
   
   const chartLabels = chLabels.map((L, i) => {
-    return `${L} ${enLabels[i]}`;
+    return currentLang === 'en' ? enLabels[i] : `${L} ${enLabels[i]}`;
   });
 
   // 圖表改為黑金色調，並且將分數直接在標籤上秀出星星
   const data = {
     labels: chartLabels,
     datasets: [{
-      label: '五感分數 (滿分5星)',
+      label: currentLang === 'en' ? 'Sensory Score (Out of 5 Stars)' : '五感分數 (滿分5星)',
       data: stats,
       backgroundColor: 'rgba(205, 162, 91, 0.15)', // lighter gold dim
       borderColor: 'rgba(205, 162, 91, 1)',      // gold
@@ -1715,7 +1984,7 @@ function renderRadarChart(coffeeName, stats) {
       legend: { display: false },
       title: { 
           display: true, 
-          text: '咖啡五感 Coffee Senses', 
+          text: currentLang === 'en' ? 'Coffee Senses' : '咖啡五感 Coffee Senses', 
           color: '#cda25b', 
           font: { size: 16, family: "'Oswald', 'Noto Sans TC', sans-serif" } 
       },
