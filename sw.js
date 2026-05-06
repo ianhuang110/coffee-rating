@@ -19,13 +19,21 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // 改為 Network-First (網路優先) 策略，確保每次都抓最新檔案，失敗時才讀取快取
+  // 關鍵修改：只處理來自自己網域的 GET 請求
+  // 排除 Firebase Storage 和 Realtime DB 的請求，避免 CORS 衝突與轉型錯誤
+  if (
+    event.request.method !== 'GET' || 
+    !event.request.url.startsWith(self.location.origin)
+  ) {
+    return; // 直接跳過，不進行 event.respondWith，讓瀏覽器原生機制處理
+  }
+
   event.respondWith(
       fetch(event.request)
         .then(response => {
           return caches.open(CACHE_NAME).then(cache => {
-            // 只有 GET 請求且為 http/https 協定才快取，避免擋住 Firebase 的資料庫連線
-            if (event.request.method === 'GET' && event.request.url.startsWith('http')) {
+            // 只有成功的請求且協定符合才快取
+            if (response.ok && event.request.url.startsWith('http')) {
                 cache.put(event.request, response.clone());
             }
             return response;
