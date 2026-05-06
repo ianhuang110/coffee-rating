@@ -35,6 +35,23 @@ const cafeCoordinates = {
   const mapBounds = L.latLngBounds();
   const targetCoords = [];
   
+  const cafeDetails = {
+    "Simple Kaffa 興波咖啡": { address: "台北市中正區忠孝東路二段27號", phone: "02-3322-1888" },
+    "Fika Fika Cafe": { address: "台北市中山區伊通街33號一樓", phone: "02-2507-0633" },
+    "豆舖咖啡館": { address: "桃園市桃園區大興西路二段322號", phone: "03-358-2921" },
+    "SIDRA 栖爪咖啡": { address: "桃園市桃園區慈文路635巷27號", phone: "請見粉專公告" },
+    "ML coffee 慕光咖啡工作室": { address: "桃園市桃園區慈德街", phone: "請見粉專公告" },
+    "Jo's Corner Café": { address: "桃園市桃園區國強一街135號", phone: "03-360-1566" },
+    "著手咖啡 Coffee Intro (中壢內壢店)": { address: "桃園市中壢區大華路", phone: "請見粉專公告" },
+    "拾事咖啡 SEIZE THE DAY": { address: "桃園市中壢區福星六街67號1樓", phone: "03-453-6456" },
+    "暖空咖啡 Warm air Kafe": { address: "桃園市中壢區中光路31號", phone: "請見粉專公告" },
+    "墨咖啡 Ink Coffee": { address: "新竹市東區林森路180號", phone: "03-522-0608" },
+    "The Factory Mojocoffee": { address: "台中市西區精誠六街22號", phone: "04-2328-9448" },
+    "著手咖啡 Coffee Intro": { address: "台中市西區向上北路224號", phone: "04-2301-1733" },
+    "存憶 Cafe Bar": { address: "台南市中西區國華街三段211號", phone: "0928-090-000" },
+    "馤咖啡。食作": { address: "高雄市左營區文康路74巷58號", phone: "07-350-0000" }
+  };
+
   Object.keys(cafeCoordinates).forEach(cafe => {
       const coords = cafeCoordinates[cafe];
       mapBounds.extend(coords);
@@ -50,19 +67,21 @@ const cafeCoordinates = {
           weight: isTarget ? 3 : (targetCoffee ? 1 : 3)
       }).addTo(map);
       
-      marker.bindPopup(`<b>${cafe}</b>`);
+      const details = cafeDetails[cafe] || { address: '暫無資料', phone: '暫無資料' };
+      const popupHtml = `
+        <div style="font-family: 'Noto Sans TC', sans-serif; min-width: 150px; padding: 5px;">
+            <b style="font-size: 1.1rem; color: #cda25b; margin-bottom: 5px; display: block;">${cafe}</b>
+            <div style="font-size: 0.9rem; color: #555; margin-bottom: 5px;">
+                📍 ${details.address}
+            </div>
+            <div style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">
+                📞 ${details.phone}
+            </div>
+            <a href="index.html?search=${encodeURIComponent(cafe)}" style="display: block; text-align: center; background: #cda25b; color: white; text-decoration: none; padding: 6px; border-radius: 4px; font-weight: bold;">查看單品咖啡</a>
+        </div>
+      `;
       
-      marker.on('mouseover', function () {
-          this.openPopup();
-      });
-      
-      marker.on('mouseout', function () {
-          this.closePopup();
-      });
-      
-      marker.on('click', function () {
-          window.location.href = `index.html?search=${encodeURIComponent(cafe)}`;
-      });
+      marker.bindPopup(popupHtml);
   });
   
   if (targetCoffee && targetCoords.length > 0) {
