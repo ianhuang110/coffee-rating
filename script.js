@@ -1796,6 +1796,50 @@ window.showAlert = function(msg) {
     });
   }
 
+  function compressImage(file, maxWidth = 1000, quality = 0.8) {
+      return new Promise((resolve) => {
+          if (!file.type.match(/image.*/)) {
+              resolve(file);
+              return;
+          }
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = event => {
+              const img = new Image();
+              img.src = event.target.result;
+              img.onload = () => {
+                  let width = img.width;
+                  let height = img.height;
+
+                  if (width > maxWidth) {
+                      height = Math.round((height * maxWidth) / width);
+                      width = maxWidth;
+                  }
+
+                  const canvas = document.createElement('canvas');
+                  canvas.width = width;
+                  canvas.height = height;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, width, height);
+                  
+                  canvas.toBlob(blob => {
+                      if (blob) {
+                         const newFile = new File([blob], file.name, {
+                             type: 'image/jpeg',
+                             lastModified: Date.now()
+                         });
+                         resolve(newFile);
+                      } else {
+                         resolve(file);
+                      }
+                  }, 'image/jpeg', quality);
+              };
+              img.onerror = () => resolve(file);
+          };
+          reader.onerror = () => resolve(file);
+      });
+  }
+
   reviewForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const input = document.getElementById('review-input');
@@ -1815,9 +1859,11 @@ window.showAlert = function(msg) {
 
         let imageUrls = [];
         if (selectedImageFiles.length > 0 && window.firebaseDB) {
-            const uploadPromises = selectedImageFiles.map(file => window.firebaseDB.uploadReviewImage(file));
+            const compressedFiles = await Promise.all(selectedImageFiles.map(file => compressImage(file)));
+            const uploadPromises = compressedFiles.map(file => window.firebaseDB.uploadReviewImage(file));
             const results = await Promise.all(uploadPromises);
             imageUrls = results.filter(url => url !== null);
+
         }
 
         // 複製一份陣列儲存
