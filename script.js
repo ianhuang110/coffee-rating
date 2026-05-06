@@ -928,12 +928,61 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-close-modal').addEventListener('click', () => {
     document.getElementById('login-modal').classList.add('hidden');
   });
+
+window.showAlert = function(msg) {
+  if (typeof currentLang !== 'undefined' && currentLang === 'zh') {
+    alert(msg);
+    return;
+  }
+  const tMap = {
+    '請輸入新密碼': 'Please enter a new password.',
+    '密碼修改成功！下次請使用新密碼登入。': 'Password changed successfully! Please login with your new password.',
+    '修改失敗，請稍後再試。': 'Update failed, please try again later.',
+    '請填寫完整姓名、電話與 Email！': 'Please fill in your name, phone, and Email.',
+    '請輸入 Email 及密碼': 'Please enter your Email and password.',
+    '請先在上方輸入您的 Email，然後再點擊忘記密碼！': 'Please enter your Email above before clicking forgot password!',
+    '資料庫連線中，請稍候': 'Connecting to database, please wait...',
+    '此 Email 已經註冊過囉，請直接使用密碼登入！': 'This Email is already registered. Please login!',
+    '伺服器錯誤，請稍後再試': 'Server error, please try again later.',
+    '找不到此 Email 的註冊紀錄，請先註冊會員！': 'Account not found. Please register first!',
+    'Email 或密碼錯誤！': 'Incorrect Email or password!',
+    '伺服器錯誤': 'Server error.',
+    '伺服器發生異常。': 'Server error occurred.',
+    '請選擇相片': 'Please select a photo.'
+  };
+
+  if (msg.includes('註冊成功，密碼已發送至')) {
+    let emailMatch = msg.match(/發送至 ([^\uff01]+)！/);
+    let pwdMatch = msg.match(/初始密碼為：([^\n]+)/);
+    let email = emailMatch ? emailMatch[1] : '';
+    let pwd = pwdMatch ? pwdMatch[1] : '';
+    alert(`[System] Registration successful! Password sent to ${email}.\n\nYour initial password is: ${pwd}\n\nPlease login and change your password.`);
+    return;
+  }
+  
+  if (msg.includes('密碼重置成功，新密碼已發送至')) {
+    let emailMatch = msg.match(/發送至 ([^\uff01]+)！/);
+    let pwdMatch = msg.match(/新密碼為：([^\n]+)/);
+    let email = emailMatch ? emailMatch[1] : '';
+    let pwd = pwdMatch ? pwdMatch[1] : '';
+    alert(`[System] Password reset! New password sent to ${email}.\n\nYour new password is: ${pwd}\n\nPlease login and change your password.`);
+    return;
+  }
+  
+  if (msg.startsWith('發生錯誤：')) {
+    alert(msg.replace('發生錯誤：', 'An error occurred: '));
+    return;
+  }
+
+  alert(tMap[msg] || msg);
+};
+
   document.getElementById('btn-submit-login').addEventListener('click', async () => {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     if(email && password) {
        
-      if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
+      if (!window.firebaseDB) { showAlert("資料庫連線中，請稍候"); return; }
       const res = await window.firebaseDB.loginUser(email, password);
       
       if (res.success) {
@@ -944,10 +993,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAuth();
         document.getElementById('login-modal').classList.add('hidden');
       } else {
-        alert(res.message);
+        showAlert(res.message);
       }
     } else {
-      alert('請輸入 Email 及密碼');
+      showAlert('請輸入 Email 及密碼');
     }
   });
   const linkForgotPwd = document.getElementById('link-forgot-password');
@@ -956,18 +1005,18 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       if (!email) {
-        alert('請先在上方輸入您的 Email，然後再點擊忘記密碼！');
+        showAlert('請先在上方輸入您的 Email，然後再點擊忘記密碼！');
         return;
       }
-      if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
+      if (!window.firebaseDB) { showAlert("資料庫連線中，請稍候"); return; }
       
       const randomPwd = Math.random().toString(36).substring(2, 8);
       const res = await window.firebaseDB.resetPassword(email, randomPwd);
       if (res.success) {
-          alert(`【系統模擬】密碼重置成功，新密碼已發送至 ${email}！\n\n您的新密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請務必自行修改密碼。`);
+          showAlert(`【系統模擬】密碼重置成功，新密碼已發送至 ${email}！\n\n您的新密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請務必自行修改密碼。`);
           document.getElementById('login-password').value = randomPwd;
       } else {
-          alert(res.message);
+          showAlert(res.message);
       }
     });
   }
@@ -997,22 +1046,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('reg-email').value.trim();
 
       if (!name || !phone || !email) {
-        alert('請填寫完整姓名、電話與 Email！');
+        showAlert('請填寫完整姓名、電話與 Email！');
         return;
       }
-      if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
+      if (!window.firebaseDB) { showAlert("資料庫連線中，請稍候"); return; }
       
       const randomPwd = Math.random().toString(36).substring(2, 8);
       const res = await window.firebaseDB.registerUser(email, name, phone, randomPwd);
       if (res.success) {
-          alert(`【系統模擬】註冊成功，密碼已發送至 ${email}！\n\n您的初始密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請自行修改密碼。`);
+          showAlert(`【系統模擬】註冊成功，密碼已發送至 ${email}！\n\n您的初始密碼為：${randomPwd}\n\n請使用此密碼登入，登入後請自行修改密碼。`);
           // 自動切換到登入 modal 並帶入參數
           document.getElementById('register-modal').classList.add('hidden');
           document.getElementById('login-modal').classList.remove('hidden');
           document.getElementById('login-email').value = email;
           document.getElementById('login-password').value = randomPwd;
       } else {
-          alert(res.message);
+          showAlert(res.message);
           if(res.message.includes('已經註冊過')) {
              document.getElementById('register-modal').classList.add('hidden');
              document.getElementById('login-modal').classList.remove('hidden');
@@ -1041,17 +1090,17 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmitPwd.addEventListener('click', async () => {
       const newPwd = document.getElementById('new-password').value;
       if (newPwd && currentEmail) {
-        if (!window.firebaseDB) { alert("資料庫連線中，請稍候"); return; }
+        if (!window.firebaseDB) { showAlert("資料庫連線中，請稍候"); return; }
         const res = await window.firebaseDB.updatePassword(currentEmail, newPwd);
         if (res.success) {
-            alert('密碼修改成功！下次請使用新密碼登入。');
+            showAlert('密碼修改成功！下次請使用新密碼登入。');
             document.getElementById('password-modal').classList.add('hidden');
             document.getElementById('new-password').value = '';
         } else {
-            alert('修改失敗，請稍後再試。');
+            showAlert('修改失敗，請稍後再試。');
         }
       } else {
-        alert('請輸入新密碼');
+        showAlert('請輸入新密碼');
       }
     });
   }
@@ -1821,7 +1870,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.opacity = '1';
           }, 4000);
         } else {
-          alert('發生錯誤：' + err.message);
+          showAlert('發生錯誤：' + err.message);
         }
       }
     }
