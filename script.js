@@ -859,8 +859,12 @@ async function renderReviews(coffeeId) {
       let scoreToDisplay = r.userAvg || r.avg || '-';
       
       const author = r.user ? r.user : '訪客';
-      let images = r.imageUrls || [];
-      if (r.imageUrl && images.length === 0) images = [r.imageUrl]; // 向後相容
+      let images = [];
+      if (r.imageUrls) {
+          images = Array.isArray(r.imageUrls) ? r.imageUrls : [r.imageUrls];
+      } else if (r.imageUrl) {
+          images = Array.isArray(r.imageUrl) ? r.imageUrl : [r.imageUrl];
+      }
       let imgHtml = '';
       if (images.length > 0) {
           imgHtml = '<div style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px;">';
@@ -1796,47 +1800,65 @@ window.showAlert = function(msg) {
     });
   }
 
-  function compressImage(file, maxWidth = 1000, quality = 0.8) {
+  function compressImage(file, maxWidth = 1024, quality = 0.7) {
       return new Promise((resolve) => {
           if (!file.type.match(/image.*/)) {
               resolve(file);
               return;
           }
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = event => {
-              const img = new Image();
-              img.src = event.target.result;
-              img.onload = () => {
-                  let width = img.width;
-                  let height = img.height;
+          
+          // 設定逾時，避免某些格式導致瀏覽器解碼卡死
+          const timeout = setTimeout(() => {
+              console.warn('壓縮逾時，直接上傳原檔');
+              resolve(file);
+          }, 10000);
 
-                  if (width > maxWidth) {
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.src = url;
+          img.onload = () => {
+              clearTimeout(timeout);
+              URL.revokeObjectURL(url);
+              
+              let width = img.width;
+              let height = img.height;
+
+              if (width > maxWidth || height > maxWidth) {
+                  if (width > height) {
                       height = Math.round((height * maxWidth) / width);
                       width = maxWidth;
+                  } else {
+                      width = Math.round((width * maxWidth) / height);
+                      height = maxWidth;
                   }
+              }
 
-                  const canvas = document.createElement('canvas');
-                  canvas.width = width;
-                  canvas.height = height;
-                  const ctx = canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, height);
-                  
-                  canvas.toBlob(blob => {
-                      if (blob) {
-                         const newFile = new File([blob], file.name, {
-                             type: 'image/jpeg',
-                             lastModified: Date.now()
-                         });
-                         resolve(newFile);
-                      } else {
-                         resolve(file);
-                      }
-                  }, 'image/jpeg', quality);
-              };
-              img.onerror = () => resolve(file);
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              
+              // 處理手機拍照轉向問題 (簡易處理)
+              ctx.drawImage(img, 0, 0, width, height);
+              
+              canvas.toBlob(blob => {
+                  if (blob) {
+                     const newFile = new File([blob], file.name, {
+                         type: 'image/jpeg',
+                         lastModified: Date.now()
+                     });
+                     // 如果壓縮後反而變大（極少見），則使用原檔
+                     resolve(newFile.size < file.size ? newFile : file);
+                  } else {
+                     resolve(file);
+                  }
+              }, 'image/jpeg', quality);
           };
-          reader.onerror = () => resolve(file);
+          img.onerror = () => {
+              clearTimeout(timeout);
+              URL.revokeObjectURL(url);
+              resolve(file);
+          };
       });
   }
 
@@ -1859,11 +1881,18 @@ window.showAlert = function(msg) {
 
         let imageUrls = [];
         if (selectedImageFiles.length > 0 && window.firebaseDB) {
-            const compressedFiles = await Promise.all(selectedImageFiles.map(file => compressImage(file)));
-            const uploadPromises = compressedFiles.map(file => window.firebaseDB.uploadReviewImage(file));
-            const results = await Promise.all(uploadPromises);
-            imageUrls = results.filter(url => url !== null);
-
+            const total = selectedImageFiles.length;
+            for (let i = 0; i < total; i++) {
+                if (btn) btn.textContent = `處理中 (${i + 1}/${total})...`;
+                try {
+                    const compressed = await compressImage(selectedImageFiles[i]);
+                    if (btn) btn.textContent = `上傳中 (${i + 1}/${total})...`;
+                    const url = await window.firebaseDB.uploadReviewImage(compressed);
+                    if (url) imageUrls.push(url);
+                } catch (uploadErr) {
+                    console.error(`第 ${i+1} 張圖片處理失敗:`, uploadErr);
+                }
+            }
         }
 
         // 複製一份陣列儲存

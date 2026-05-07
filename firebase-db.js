@@ -49,7 +49,7 @@ window.firebaseDB = {
             return null;
         }
     },
-    async saveReview(coffeeId, text, stats, overallScore, userName, imageUrl = null) {
+    async saveReview(coffeeId, text, stats, overallScore, userName, imageUrls = null) {
         try {
             const now = new Date();
             const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
@@ -63,7 +63,8 @@ window.firebaseDB = {
                 date: dateStr,
                 stats: stats,
                 userAvg: overallScore,
-                imageUrl: imageUrl,
+                imageUrl: imageUrls, // 保持相容性，存入 imageUrl 欄位
+                imageUrls: imageUrls, // 新增複數欄位
                 timestamp: Date.now()
             });
             return true;
