@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getDatabase, ref, push, get, child, query, orderByChild, equalTo, set, update, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { getDatabase, ref, push, get, child, query, orderByChild, equalTo, set, update, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -117,6 +117,14 @@ window.firebaseDB = {
                 return { success: false, message: 'Email 或密碼錯誤！' };
             }
             
+            if (loggedInUser.isLoggedIn) {
+                return { success: false, message: '此帳號已在其他裝置登入！' };
+            }
+            
+            const userRef = ref(db, `users/${loggedInUserId}`);
+            await update(userRef, { isLoggedIn: true });
+            onDisconnect(child(userRef, 'isLoggedIn')).set(false);
+            
             return { success: true, user: loggedInUser, id: loggedInUserId };
         } catch(e) {
             console.error(e);
@@ -216,6 +224,24 @@ window.firebaseDB = {
             return true;
         } catch(e) {
             console.error("回覆評論失敗:", e);
+            return false;
+        }
+    },
+    async logoutUser(email) {
+        try {
+            const usersRef = ref(db, "users");
+            const q = query(usersRef, orderByChild("email"), equalTo(email));
+            const snapshot = await get(q);
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const userRef = ref(db, `users/${childSnapshot.key}`);
+                    update(userRef, { isLoggedIn: false });
+                    onDisconnect(child(userRef, 'isLoggedIn')).cancel();
+                });
+            }
+            return true;
+        } catch(e) {
+            console.error("登出失敗:", e);
             return false;
         }
     }

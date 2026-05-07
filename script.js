@@ -951,7 +951,8 @@ window.showAlert = function(msg) {
     'Email 或密碼錯誤！': 'Incorrect Email or password!',
     '伺服器錯誤': 'Server error.',
     '伺服器發生異常。': 'Server error occurred.',
-    '請選擇相片': 'Please select a photo.'
+    '請選擇相片': 'Please select a photo.',
+    '此帳號已在其他裝置登入！': 'This account is already logged in on another device!'
   };
 
   if (msg.includes('註冊成功，密碼已發送至')) {
@@ -1108,7 +1109,10 @@ window.showAlert = function(msg) {
     });
   }
 
-  document.getElementById('btn-logout').addEventListener('click', () => {
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    if (window.firebaseDB && currentEmail) {
+        await window.firebaseDB.logoutUser(currentEmail);
+    }
     currentUser = null;
     currentEmail = null;
     localStorage.removeItem('coffee_user');
@@ -1712,8 +1716,8 @@ window.showAlert = function(msg) {
                 <div style="font-weight:bold; color:var(--accent-gold); font-size:1.05rem;">${coffeeName}</div>
                 <span style="color:#888; font-size:0.85rem;">${r.date}</span>
               </div>
-              <div style="font-size:1rem; color:#ccc; line-height: 1.5; margin-bottom: 10px;">"${textPreview}"</div>
-              <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px dashed #333; padding-top: 8px;">
+              <div style="font-size:1rem; color:#666; line-height: 1.5; margin-bottom: 10px;">"${textPreview}"</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px dashed #ccc; padding-top: 8px;">
                 <span style="color:#888; font-size: 0.9rem;">來自 <strong>${author}</strong></span>
                 <strong style="color:var(--accent-gold); font-size: 0.9rem;">評分: ${scoreToDisplay} / 10</strong>
               </div>
