@@ -188,5 +188,36 @@ window.firebaseDB = {
             console.error("讀取所有評論失敗:", e);
             return [];
         }
+    },
+    async deleteReview(reviewId) {
+        try {
+            const reviewRef = ref(db, `reviews/${reviewId}`);
+            const { remove } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js");
+            await remove(reviewRef);
+            return true;
+        } catch(e) {
+            console.error("刪除評論失敗:", e);
+            return false;
+        }
+    },
+    async updateReview(reviewId, newText) {
+        try {
+            const reviewRef = ref(db, `reviews/${reviewId}`);
+            await update(reviewRef, { text: newText });
+            return true;
+        } catch(e) {
+            console.error("更新評論失敗:", e);
+            return false;
+        }
+    },
+    async replyToReview(reviewId, replyText) {
+        try {
+            const reviewRef = ref(db, `reviews/${reviewId}`);
+            await update(reviewRef, { reply: replyText });
+            return true;
+        } catch(e) {
+            console.error("回覆評論失敗:", e);
+            return false;
+        }
     }
 };

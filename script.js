@@ -879,6 +879,7 @@ async function renderReviews(coffeeId) {
           <span style="color:#888; font-size:0.85rem;">[${r.date}]</span>
         </div>
         <div style="font-size:1.05rem; color:#555; line-height: 1.6; margin-bottom: 15px;">${r.text}</div>
+        ${r.reply ? `<div style="background:#f9f9f9; padding:10px 12px; margin-bottom:15px; border-radius:6px; border-left: 3px solid var(--accent-gold);"><strong style="color:var(--accent-gold); font-size:0.9rem;">站長回覆：</strong><div style="margin-top:4px; font-size:0.95rem; color:#444;">${r.reply}</div></div>` : ''}
         ${imgHtml}
         <div style="border-top: 1px dashed #eee; padding-top: 12px;">
           <div style="display: flex; align-items: center; margin-bottom: 8px;">

@@ -109,13 +109,76 @@ function renderUserReviews(userReviews) {
                     <div class="review-coffee-name">${coffeeName}</div>
                     <div class="review-date">${review.date}</div>
                 </div>
-                <div class="review-text">${review.text}</div>
+                <div class="review-text" id="text-${review.id}">${review.text}</div>
+                <div class="review-reply" id="reply-${review.id}" style="background:#222; padding:8px; margin-top:8px; border-radius:4px; font-size:0.9rem; color:#aaa; display: ${review.reply ? 'block' : 'none'};">
+                    <strong style="color:var(--accent-gold);">管理員回覆：</strong> <span>${review.reply || ''}</span>
+                </div>
                 <div class="review-score-badge">總評: ${review.userAvg || review.avg || '?'} / 10</div>
+                <div class="review-actions" style="margin-top: 15px; display: flex; gap: 8px;">
+                    <button class="btn-edit" style="background:#444; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">編輯評論</button>
+                    <button class="btn-reply" style="background:#1a4a1a; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">回覆留言</button>
+                    <button class="btn-delete" style="background:#5a1a1a; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">刪除</button>
+                </div>
             </div>
             <div class="review-chart">
                 <canvas id="${canvasId}"></canvas>
             </div>
         `;
+        
+        // 綁定按鈕事件
+        const btnEdit = card.querySelector('.btn-edit');
+        const btnReply = card.querySelector('.btn-reply');
+        const btnDelete = card.querySelector('.btn-delete');
+        
+        btnEdit.addEventListener('click', async () => {
+            const newText = prompt('編輯評論內容:', review.text);
+            if (newText !== null && newText.trim() !== '') {
+                const success = await window.firebaseDB.updateReview(review.id, newText.trim());
+                if (success) {
+                    review.text = newText.trim();
+                    card.querySelector(`#text-${review.id}`).textContent = review.text;
+                    alert('編輯成功！');
+                } else {
+                    alert('編輯失敗。');
+                }
+            }
+        });
+        
+        btnReply.addEventListener('click', async () => {
+            const newReply = prompt('請輸入您的回覆 (留空將清除回覆):', review.reply || '');
+            if (newReply !== null) {
+                const success = await window.firebaseDB.replyToReview(review.id, newReply.trim());
+                if (success) {
+                    review.reply = newReply.trim();
+                    const replyDiv = card.querySelector(`#reply-${review.id}`);
+                    if (review.reply) {
+                        replyDiv.style.display = 'block';
+                        replyDiv.querySelector('span').textContent = review.reply;
+                    } else {
+                        replyDiv.style.display = 'none';
+                    }
+                    alert('回覆已更新！');
+                } else {
+                    alert('回覆更新失敗。');
+                }
+            }
+        });
+        
+        btnDelete.addEventListener('click', async () => {
+            if (confirm('確定要刪除這則評論嗎？這將無法復原。')) {
+                const success = await window.firebaseDB.deleteReview(review.id);
+                if (success) {
+                    alert('評論已刪除。');
+                    // 從 allReviews 中移除並重新渲染
+                    allReviews = allReviews.filter(r => r.id !== review.id);
+                    card.remove();
+                    document.getElementById('review-count').textContent = allReviews.filter(r => r.user === review.user).length;
+                } else {
+                    alert('刪除失敗。');
+                }
+            }
+        });
+
         container.appendChild(card);
         
         // 繪製雷達圖
