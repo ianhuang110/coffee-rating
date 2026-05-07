@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getDatabase, ref, push, get, child, query, orderByChild, equalTo, set, update } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { getDatabase, ref, push, get, child, query, orderByChild, equalTo, set, update, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -192,7 +192,6 @@ window.firebaseDB = {
     async deleteReview(reviewId) {
         try {
             const reviewRef = ref(db, `reviews/${reviewId}`);
-            const { remove } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js");
             await remove(reviewRef);
             return true;
         } catch(e) {
