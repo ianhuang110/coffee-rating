@@ -795,6 +795,10 @@ async function renderReviews(coffeeId) {
   reviewsContainer.innerHTML = '';
   
   const reviews = await getReviews(coffeeId);
+  
+  // 防呆：如果載入完成後，使用者已經切換到其他咖啡豆，就不渲染這次的結果
+  if (coffeeId !== activeCoffeeId) return;
+  
   let dynamicStats = activeCoffeeObj ? activeCoffeeObj.stats.map(s => Math.round(s)) : [5,5,5,5,5];
   
   // 計算這支咖啡的平均總分與五感動態變化
@@ -832,6 +836,9 @@ async function renderReviews(coffeeId) {
   if (reviews.length === 0) {
     reviewsContainer.innerHTML = '<div class="review-item" style="color: #666; font-style: italic;">目前還沒有評論，成為第一個留下心得的人吧！</div>';
   } else {
+    // 在 append 之前再次清空，避免非同步競爭條件導致重複疊加
+    reviewsContainer.innerHTML = '';
+    
     // 最新評論顯示在上方
     const reversed = [...reviews].reverse();
     reversed.forEach(r => {
