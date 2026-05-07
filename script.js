@@ -1734,133 +1734,6 @@ window.showAlert = function(msg) {
     });
   }
 
-  let selectedImageFiles = [];
-  const reviewImageInput = document.getElementById('review-image');
-  const reviewImagePreview = document.getElementById('review-image-preview');
-
-  function updateImagePreviews() {
-      if (!reviewImagePreview) return;
-      reviewImagePreview.innerHTML = '';
-      if (selectedImageFiles.length === 0) {
-          reviewImagePreview.style.display = 'none';
-          return;
-      }
-      reviewImagePreview.style.display = 'flex';
-      selectedImageFiles.forEach((file, index) => {
-          const wrapper = document.createElement('div');
-          wrapper.style.position = 'relative';
-          wrapper.style.display = 'inline-block';
-          
-          const img = document.createElement('img');
-          img.style.maxHeight = '100px';
-          img.style.borderRadius = '4px';
-          img.style.border = '1px solid #ddd';
-          
-          const reader = new FileReader();
-          reader.onload = (ev) => img.src = ev.target.result;
-          reader.readAsDataURL(file);
-          
-          const removeBtn = document.createElement('button');
-          removeBtn.type = 'button';
-          removeBtn.innerHTML = '&times;';
-          removeBtn.style.position = 'absolute';
-          removeBtn.style.top = '-5px';
-          removeBtn.style.right = '-5px';
-          removeBtn.style.background = 'rgba(255,0,0,0.8)';
-          removeBtn.style.color = '#fff';
-          removeBtn.style.border = 'none';
-          removeBtn.style.borderRadius = '50%';
-          removeBtn.style.width = '20px';
-          removeBtn.style.height = '20px';
-          removeBtn.style.cursor = 'pointer';
-          removeBtn.style.fontSize = '12px';
-          removeBtn.style.display = 'flex';
-          removeBtn.style.alignItems = 'center';
-          removeBtn.style.justifyContent = 'center';
-          
-          removeBtn.addEventListener('click', () => {
-              selectedImageFiles.splice(index, 1);
-              updateImagePreviews();
-          });
-          
-          wrapper.appendChild(img);
-          wrapper.appendChild(removeBtn);
-          reviewImagePreview.appendChild(wrapper);
-      });
-  }
-
-  if (reviewImageInput) {
-    reviewImageInput.addEventListener('change', (e) => {
-      const files = Array.from(e.target.files);
-      if (files.length > 0) {
-        selectedImageFiles = selectedImageFiles.concat(files);
-        updateImagePreviews();
-        reviewImageInput.value = ''; // Reset input to allow adding same file again if wanted
-      }
-    });
-  }
-
-  function compressImage(file, maxWidth = 1024, quality = 0.7) {
-      return new Promise((resolve) => {
-          if (!file.type.match(/image.*/)) {
-              resolve(file);
-              return;
-          }
-          
-          // 設定逾時，避免某些格式導致瀏覽器解碼卡死
-          const timeout = setTimeout(() => {
-              console.warn('壓縮逾時，直接上傳原檔');
-              resolve(file);
-          }, 10000);
-
-          const url = URL.createObjectURL(file);
-          const img = new Image();
-          img.src = url;
-          img.onload = () => {
-              clearTimeout(timeout);
-              URL.revokeObjectURL(url);
-              
-              let width = img.width;
-              let height = img.height;
-
-              if (width > maxWidth || height > maxWidth) {
-                  if (width > height) {
-                      height = Math.round((height * maxWidth) / width);
-                      width = maxWidth;
-                  } else {
-                      width = Math.round((width * maxWidth) / height);
-                      height = maxWidth;
-                  }
-              }
-
-              const canvas = document.createElement('canvas');
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              
-              // 處理手機拍照轉向問題 (簡易處理)
-              ctx.drawImage(img, 0, 0, width, height);
-              
-              canvas.toBlob(blob => {
-                  if (blob) {
-                     const newFile = new File([blob], file.name, {
-                         type: 'image/jpeg',
-                         lastModified: Date.now()
-                     });
-                     // 如果壓縮後反而變大（極少見），則使用原檔
-                     resolve(newFile.size < file.size ? newFile : file);
-                  } else {
-                     resolve(file);
-                  }
-              }, 'image/jpeg', quality);
-          };
-          img.onerror = () => {
-              clearTimeout(timeout);
-              URL.revokeObjectURL(url);
-              resolve(file);
-          };
-      });
-  }
 
   reviewForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1879,24 +1752,8 @@ window.showAlert = function(msg) {
            btn.style.opacity = '0.7';
         }
 
-        let imageUrls = [];
-        if (selectedImageFiles.length > 0 && window.firebaseDB) {
-            const total = selectedImageFiles.length;
-            for (let i = 0; i < total; i++) {
-                if (btn) btn.textContent = `處理中 (${i + 1}/${total})...`;
-                try {
-                    const compressed = await compressImage(selectedImageFiles[i]);
-                    if (btn) btn.textContent = `上傳中 (${i + 1}/${total})...`;
-                    const url = await window.firebaseDB.uploadReviewImage(compressed);
-                    if (url) imageUrls.push(url);
-                } catch (uploadErr) {
-                    console.error(`第 ${i+1} 張圖片處理失敗:`, uploadErr);
-                }
-            }
-        }
-
         // 複製一份陣列儲存
-        await saveReview(activeCoffeeId, text, [...currentStars], overallScore, imageUrls);
+        await saveReview(activeCoffeeId, text, [...currentStars], overallScore, []);
         input.value = '';
         
         // 重置
@@ -1907,8 +1764,7 @@ window.showAlert = function(msg) {
           updateStars(container, 3);
         });
 
-        selectedImageFiles = [];
-        updateImagePreviews();
+
         
         if (btn) {
            btn.textContent = originalText;
