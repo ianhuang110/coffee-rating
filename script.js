@@ -1626,6 +1626,100 @@ window.showAlert = function(msg) {
     if (window.applyTranslation) window.applyTranslation();
   }
 
+  async function renderLatestReviews() {
+    const container = document.getElementById('latest-reviews-home-container');
+    if (!container) return;
+    
+    // 顯示載入中
+    container.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">載入中...</div>';
+    
+    // 最多重試等待 Firebase 連線
+    let retryCount = 0;
+    while (!window.firebaseDB && retryCount < 20) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        retryCount++;
+    }
+    
+    if (!window.firebaseDB) {
+        container.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">無法載入留言</div>';
+        return;
+    }
+
+    try {
+        const allReviews = await window.firebaseDB.getAllReviews();
+        if (!allReviews || allReviews.length === 0) {
+            container.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">目前還沒有任何留言。</div>';
+            return;
+        }
+
+        // 取最新的 5 則
+        const latest5 = allReviews.slice(0, 5);
+        container.innerHTML = '';
+        
+        latest5.forEach(r => {
+            const coffee = masterCoffees.find(c => c.id === r.coffeeId);
+            const coffeeName = coffee ? coffee.name : '未知單品咖啡';
+            const author = r.user ? r.user : '訪客';
+            const scoreToDisplay = r.userAvg || r.avg || '-';
+            
+            const item = document.createElement('div');
+            item.className = 'review-item';
+            item.style.cursor = 'pointer';
+            item.style.transition = 'transform 0.2s';
+            item.onmouseover = () => item.style.transform = 'translateY(-2px)';
+            item.onmouseout = () => item.style.transform = 'translateY(0)';
+            
+            // 點擊後跳轉到該咖啡詳細頁
+            item.onclick = () => {
+                if (coffee) {
+                    showCoffeeDetails(coffee.cafeName, coffee);
+                    // 嘗試展開側邊欄對應選項
+                    const sidebarItem = document.querySelector(`.coffee-item[data-id="${coffee.id}"]`);
+                    if(sidebarItem) {
+                        const countryList = sidebarItem.closest('.country-list');
+                        if (countryList) {
+                            countryList.classList.add('open');
+                            if (countryList.previousElementSibling) countryList.previousElementSibling.classList.add('open');
+                        }
+                        const contBody = sidebarItem.closest('.continent-body');
+                        if (contBody) {
+                            contBody.classList.add('open');
+                            if (contBody.previousElementSibling) contBody.previousElementSibling.classList.add('open');
+                        }
+                        sidebarItem.click();
+                        setTimeout(() => {
+                            sidebarItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                    }
+                }
+            };
+            
+            // 處理截斷的留言內容 (如果太長)
+            let textPreview = r.text;
+            if (textPreview.length > 60) {
+                textPreview = textPreview.substring(0, 60) + '...';
+            }
+            
+            item.innerHTML = `
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                <div style="font-weight:bold; color:var(--accent-gold); font-size:1.05rem;">${coffeeName}</div>
+                <span style="color:#888; font-size:0.85rem;">${r.date}</span>
+              </div>
+              <div style="font-size:1rem; color:#ccc; line-height: 1.5; margin-bottom: 10px;">"${textPreview}"</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px dashed #333; padding-top: 8px;">
+                <span style="color:#888; font-size: 0.9rem;">來自 <strong>${author}</strong></span>
+                <strong style="color:var(--accent-gold); font-size: 0.9rem;">評分: ${scoreToDisplay} / 10</strong>
+              </div>
+            `;
+            container.appendChild(item);
+        });
+        if (window.applyTranslation) window.applyTranslation();
+    } catch (e) {
+        console.error("載入最新留言失敗:", e);
+        container.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">載入發生錯誤</div>';
+    }
+  }
+
   // 初始渲染
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get('search');
@@ -1649,6 +1743,9 @@ window.showAlert = function(msg) {
   
   // 渲染 每日隨機精選
   renderDailyRandomCoffees();
+  
+  // 渲染 最新留言
+  renderLatestReviews();
 
   // 綁定搜尋輸入
   if (searchInput) {
