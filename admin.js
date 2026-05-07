@@ -50,9 +50,20 @@ function renderUserList() {
     users.forEach(user => {
         const li = document.createElement('li');
         li.className = 'user-item';
+        
+        // 計算該會員的評論數
+        const userReviewCount = allReviews.filter(r => r.user === user.name).length;
+        
         li.innerHTML = `
-            <div class="user-name">${user.name}</div>
-            <div class="user-email">${user.email}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="overflow:hidden;">
+                    <div class="user-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${user.name}</div>
+                    <div class="user-email" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${user.email}</div>
+                </div>
+                ${userReviewCount > 0 
+                    ? `<div style="background:var(--accent-gold); color:#000; padding:3px 8px; border-radius:12px; font-size:0.8rem; font-weight:bold; white-space:nowrap; margin-left:10px;">${userReviewCount} 留言</div>` 
+                    : `<div style="background:#333; color:#888; padding:3px 8px; border-radius:12px; font-size:0.8rem; white-space:nowrap; margin-left:10px;">無留言</div>`}
+            </div>
         `;
         li.addEventListener('click', () => {
             document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
