@@ -244,5 +244,50 @@ window.firebaseDB = {
             console.error("登出失敗:", e);
             return false;
         }
+    },
+    async submitSuggestion(coffeeId, coffeeName, text, userName) {
+        try {
+            const newRef = push(ref(db, "suggestions"));
+            await set(newRef, {
+                coffeeId: coffeeId,
+                coffeeName: coffeeName,
+                text: text,
+                user: userName,
+                timestamp: Date.now(),
+                status: 'pending'
+            });
+            return true;
+        } catch(e) {
+            console.error("提交建議失敗:", e);
+            return false;
+        }
+    },
+    async getAllSuggestions() {
+        try {
+            const suggestionsRef = ref(db, "suggestions");
+            const snapshot = await get(suggestionsRef);
+            const suggestions = [];
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    data.id = childSnapshot.key;
+                    suggestions.push(data);
+                });
+            }
+            return suggestions.sort((a, b) => b.timestamp - a.timestamp);
+        } catch(e) {
+            console.error("讀取建議失敗:", e);
+            return [];
+        }
+    },
+    async updateSuggestionStatus(suggestionId, status) {
+        try {
+            const suggestionRef = ref(db, `suggestions/${suggestionId}`);
+            await update(suggestionRef, { status: status });
+            return true;
+        } catch(e) {
+            console.error("更新建議狀態失敗:", e);
+            return false;
+        }
     }
 };

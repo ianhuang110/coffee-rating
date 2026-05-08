@@ -214,12 +214,21 @@
     <div class="admin-container">
         <aside class="admin-sidebar">
             <div class="admin-sidebar-header">
-                <h3 style="margin: 0; color: var(--accent-gold);">註冊會員列表</h3>
-                <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #888;">共 <span id="user-count">0</span> 位</p>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin: 0; color: var(--accent-gold);" id="sidebar-title">會員與回報列表</h3>
+                    <select id="view-selector" style="background:#333; color:#fff; border:1px solid #555; border-radius:4px; padding:2px 5px; outline:none; font-size:0.85rem;">
+                        <option value="users">會員列表</option>
+                        <option value="suggestions">回報與建議</option>
+                    </select>
+                </div>
+                <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #888;">共 <span id="user-count">0</span> 筆</p>
             </div>
             <div id="users-loading" class="loading-spinner">載入中...</div>
             <ul id="user-list" class="user-list">
                 <!-- 動態載入會員 -->
+            </ul>
+            <ul id="suggestion-list" class="user-list" style="display: none;">
+                <!-- 動態載入建議 -->
             </ul>
         </aside>
 
@@ -249,6 +258,28 @@
                 <div id="reviews-loading" class="loading-spinner" style="display: none;">載入評論中...</div>
                 <div id="reviews-container" class="reviews-container">
                     <!-- 動態載入評論與雷達圖 -->
+                </div>
+            </div>
+
+            <div id="suggestion-details-view" style="display: none;">
+                <div class="user-profile-card">
+                    <div class="user-profile-header" style="align-items: flex-start;">
+                        <div class="user-info" style="width: 100%;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                <h2 id="sug-coffee-name" style="margin:0;">Coffee Name</h2>
+                                <span id="sug-status-badge" style="background:#555; color:#fff; padding:4px 8px; border-radius:12px; font-size:0.85rem;">待處理</span>
+                            </div>
+                            <p style="color:#aaa; font-size:0.9rem; margin-bottom:15px;">回報人：<span id="sug-user" style="color:#fff;">User</span> ｜ 時間：<span id="sug-date">Date</span></p>
+                            
+                            <h4 style="color:var(--accent-gold); margin-bottom:5px;">回報內容 / 建議</h4>
+                            <div id="sug-text" style="background:#222; padding:15px; border-radius:8px; color:#ddd; line-height:1.6; min-height:80px; margin-bottom:20px;"></div>
+                            
+                            <div style="display:flex; gap:10px;">
+                                <button id="btn-sug-approve" class="btn-submit" style="background:#28a745; border-color:#28a745; color:#fff;">標示為「已處理」</button>
+                                <button id="btn-sug-reject" class="btn-outline" style="border-color:#dc3545; color:#dc3545;">標示為「駁回」</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

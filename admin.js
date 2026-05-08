@@ -3,6 +3,8 @@ import "./firebase-db.js";
 let users = [];
 let allReviews = [];
 let chartInstances = {};
+let allSuggestions = [];
+let currentView = 'users';
 
 async function initAdmin() {
     let retryCount = 0;
@@ -20,18 +22,44 @@ async function initAdmin() {
     document.getElementById('users-loading').style.display = 'block';
     
     try {
-        const [usersData, reviewsData] = await Promise.all([
+        const [usersData, reviewsData, suggestionsData] = await Promise.all([
             window.firebaseDB.getAllUsers(),
-            window.firebaseDB.getAllReviews()
+            window.firebaseDB.getAllReviews(),
+            window.firebaseDB.getAllSuggestions ? window.firebaseDB.getAllSuggestions() : Promise.resolve([])
         ]);
         
         users = usersData;
         allReviews = reviewsData;
+        allSuggestions = suggestionsData;
         
         document.getElementById('user-count').textContent = users.length;
         document.getElementById('users-loading').style.display = 'none';
         
         renderUserList();
+        renderSuggestionList();
+        
+        // 綁定視圖切換事件
+        const viewSelector = document.getElementById('view-selector');
+        if (viewSelector) {
+            viewSelector.addEventListener('change', (e) => {
+                currentView = e.target.value;
+                document.getElementById('empty-state').style.display = 'flex';
+                document.getElementById('user-details-view').style.display = 'none';
+                document.getElementById('suggestion-details-view').style.display = 'none';
+                
+                if (currentView === 'users') {
+                    document.getElementById('user-list').style.display = 'block';
+                    document.getElementById('suggestion-list').style.display = 'none';
+                    document.getElementById('sidebar-title').textContent = '會員列表';
+                    document.getElementById('user-count').textContent = users.length;
+                } else {
+                    document.getElementById('user-list').style.display = 'none';
+                    document.getElementById('suggestion-list').style.display = 'block';
+                    document.getElementById('sidebar-title').textContent = '回報與建議';
+                    document.getElementById('user-count').textContent = allSuggestions.length;
+                }
+            });
+        }
     } catch(e) {
         console.error(e);
         document.getElementById('users-loading').textContent = '資料載入發生錯誤';
@@ -76,6 +104,7 @@ function renderUserList() {
 
 function showUserDetails(user) {
     document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('suggestion-details-view').style.display = 'none';
     const detailView = document.getElementById('user-details-view');
     detailView.style.display = 'block';
     
@@ -195,6 +224,122 @@ function renderUserReviews(userReviews) {
         // 繪製雷達圖
         if (review.stats) {
             drawRadarChart(canvasId, coffeeName, review.stats);
+        }
+    });
+}
+
+function renderSuggestionList() {
+    const listEl = document.getElementById('suggestion-list');
+    listEl.innerHTML = '';
+    
+    if (allSuggestions.length === 0) {
+        listEl.innerHTML = '<li style="padding: 20px; color: #888; text-align: center;">目前沒有任何回報</li>';
+        return;
+    }
+    
+    allSuggestions.forEach(sug => {
+        const li = document.createElement('li');
+        li.className = 'user-item';
+        
+        let statusText = '待處理';
+        let statusColor = '#dc3545';
+        if (sug.status === 'approved') {
+            statusText = '已處理';
+            statusColor = '#28a745';
+        } else if (sug.status === 'rejected') {
+            statusText = '已駁回';
+            statusColor = '#6c757d';
+        }
+        
+        const dateObj = new Date(sug.timestamp);
+        const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
+        
+        li.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="overflow:hidden;">
+                    <div class="user-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${sug.coffeeName || '未知單品'}</div>
+                    <div class="user-email" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">回報人：${sug.user || '未知'}</div>
+                </div>
+                <div style="background:${statusColor}; color:#fff; padding:3px 8px; border-radius:12px; font-size:0.8rem; font-weight:bold; white-space:nowrap; margin-left:10px;">${statusText}</div>
+            </div>
+        `;
+        li.addEventListener('click', () => {
+            document.querySelectorAll('#suggestion-list .user-item').forEach(el => el.classList.remove('active'));
+            li.classList.add('active');
+            showSuggestionDetails(sug);
+        });
+        listEl.appendChild(li);
+    });
+}
+
+function showSuggestionDetails(sug) {
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('user-details-view').style.display = 'none';
+    const detailView = document.getElementById('suggestion-details-view');
+    detailView.style.display = 'block';
+    
+    document.getElementById('sug-coffee-name').textContent = sug.coffeeName || '未知單品';
+    document.getElementById('sug-user').textContent = sug.user || '未知';
+    
+    const dateObj = new Date(sug.timestamp);
+    document.getElementById('sug-date').textContent = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+    
+    document.getElementById('sug-text').textContent = sug.text;
+    
+    const badge = document.getElementById('sug-status-badge');
+    const btnApprove = document.getElementById('btn-sug-approve');
+    const btnReject = document.getElementById('btn-sug-reject');
+    
+    let currentSugStatus = sug.status || 'pending';
+    
+    function updateUI() {
+        if (currentSugStatus === 'approved') {
+            badge.textContent = '已處理';
+            badge.style.background = '#28a745';
+            btnApprove.style.display = 'none';
+            btnReject.style.display = 'none';
+        } else if (currentSugStatus === 'rejected') {
+            badge.textContent = '已駁回';
+            badge.style.background = '#6c757d';
+            btnApprove.style.display = 'none';
+            btnReject.style.display = 'none';
+        } else {
+            badge.textContent = '待處理';
+            badge.style.background = '#dc3545';
+            btnApprove.style.display = 'block';
+            btnReject.style.display = 'block';
+        }
+    }
+    
+    updateUI();
+    
+    // 移除舊的 event listener
+    const newBtnApprove = btnApprove.cloneNode(true);
+    btnApprove.parentNode.replaceChild(newBtnApprove, btnApprove);
+    const newBtnReject = btnReject.cloneNode(true);
+    btnReject.parentNode.replaceChild(newBtnReject, btnReject);
+    
+    newBtnApprove.addEventListener('click', async () => {
+        if (confirm('確定標示為「已處理」？\n（系統目前僅為紀錄狀態，需自行手動修改咖啡廳資料庫）')) {
+            const success = await window.firebaseDB.updateSuggestionStatus(sug.id, 'approved');
+            if (success) {
+                currentSugStatus = 'approved';
+                sug.status = 'approved';
+                updateUI();
+                renderSuggestionList();
+            }
+        }
+    });
+    
+    newBtnReject.addEventListener('click', async () => {
+        if (confirm('確定標示為「駁回」？')) {
+            const success = await window.firebaseDB.updateSuggestionStatus(sug.id, 'rejected');
+            if (success) {
+                currentSugStatus = 'rejected';
+                sug.status = 'rejected';
+                updateUI();
+                renderSuggestionList();
+            }
         }
     });
 }

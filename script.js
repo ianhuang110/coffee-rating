@@ -941,6 +941,14 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('login-modal').classList.remove('hidden');
     });
   }
+  
+  const linkLoginReport = document.getElementById('link-login-report');
+  if (linkLoginReport) {
+      linkLoginReport.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('login-modal').classList.remove('hidden');
+      });
+  }
   document.getElementById('btn-close-modal').addEventListener('click', () => {
     document.getElementById('login-modal').classList.add('hidden');
   });
@@ -1247,6 +1255,63 @@ window.showAlert = function(msg) {
     btnCloseReviews.addEventListener('click', () => {
       document.getElementById('reviews-modal').classList.add('hidden');
     });
+  }
+
+  // 回報錯誤 Modal
+  const btnOpenReport = document.getElementById('btn-open-report');
+  const btnCloseReport = document.getElementById('btn-close-report');
+  const btnSubmitReport = document.getElementById('btn-submit-report');
+  const reportModal = document.getElementById('report-modal');
+  const reportInput = document.getElementById('report-input');
+  const reportLoginPrompt = document.getElementById('report-login-prompt');
+  
+  if (btnOpenReport) {
+      btnOpenReport.addEventListener('click', () => {
+          reportModal.classList.remove('hidden');
+          if (!currentUser) {
+              reportInput.style.display = 'none';
+              btnSubmitReport.style.display = 'none';
+              reportLoginPrompt.style.display = 'block';
+          } else {
+              reportInput.style.display = 'block';
+              btnSubmitReport.style.display = 'block';
+              reportLoginPrompt.style.display = 'none';
+              reportInput.value = '';
+          }
+      });
+  }
+  if (btnCloseReport) {
+      btnCloseReport.addEventListener('click', () => {
+          reportModal.classList.add('hidden');
+      });
+  }
+  if (btnSubmitReport) {
+      btnSubmitReport.addEventListener('click', async () => {
+          if (!activeCoffeeId || !activeCoffeeObj) return;
+          const text = reportInput.value.trim();
+          if (!text) {
+              alert('請輸入回報內容');
+              return;
+          }
+          
+          btnSubmitReport.textContent = '送出中...';
+          btnSubmitReport.disabled = true;
+          
+          if (window.firebaseDB && window.firebaseDB.submitSuggestion) {
+              const success = await window.firebaseDB.submitSuggestion(activeCoffeeId, activeCoffeeObj.name, text, currentUser);
+              if (success) {
+                  alert('感謝您的回報！我們將盡快審核。');
+                  reportModal.classList.add('hidden');
+              } else {
+                  alert('回報送出失敗，請稍後再試。');
+              }
+          } else {
+              alert('伺服器連線中，請稍後再試。');
+          }
+          
+          btnSubmitReport.textContent = '送出回報';
+          btnSubmitReport.disabled = false;
+      });
   }
   
   // 手機版詳細視窗關閉按鈕
