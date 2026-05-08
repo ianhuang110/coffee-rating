@@ -803,14 +803,18 @@ async function renderReviews(coffeeId) {
   
   // 計算這支咖啡的平均總分與五感動態變化
   let topAvgScore = 0;
+  const ratingWrap = document.querySelector('.imdb-rating-wrap');
+
   if (reviews.length > 0 && activeCoffeeObj) {
+    if (ratingWrap) ratingWrap.style.display = '';
+
     const sum = reviews.reduce((acc, r) => acc + parseFloat(r.userAvg || r.avg || 8), 0);
     topAvgScore = (sum / reviews.length).toFixed(1);
     document.getElementById('coffee-score').textContent = topAvgScore;
     
-    // 計算動態五感分數 (基礎分數 + 所有評論星數加總) / (1 + reviews.length)
+    // 計算動態五感分數 (純粹計算所有評論的星數加總平均，不再與基礎分數混算)
     for(let i=0; i<5; i++) {
-        let axisTotal = activeCoffeeObj.stats[i] || 5;
+        let axisTotal = 0;
         let validReviews = 0;
         for(let r of reviews) {
             if (r.stats && typeof r.stats[i] === 'number') {
@@ -818,19 +822,28 @@ async function renderReviews(coffeeId) {
                 validReviews++;
             }
         }
-        dynamicStats[i] = Math.round(axisTotal / (1 + validReviews));
+        
+        // 只要有任何使用者評分，就完全以使用者的平均為主
+        if (validReviews > 0) {
+            dynamicStats[i] = Math.round(axisTotal / validReviews);
+        } else {
+            dynamicStats[i] = Math.round(activeCoffeeObj.stats[i] || 5);
+        }
     }
     
-  } else if (activeCoffeeObj) {
-    // 沒評論時使用預設五感加總乘以2來當預設 10 分制評分
-    topAvgScore = (activeCoffeeObj.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
-    document.getElementById('coffee-score').textContent = topAvgScore;
-  }
-  
-  // 以動態五感驅動雷達圖
-  if (activeCoffeeObj) {
-     window.lastDynamicStats = dynamicStats;
-     renderRadarChart(activeCoffeeObj.name, dynamicStats);
+    // 以動態五感驅動雷達圖
+    window.lastDynamicStats = dynamicStats;
+    renderRadarChart(activeCoffeeObj.name, dynamicStats);
+    
+  } else {
+    // 沒評論時隱藏星號(總分區塊)
+    if (ratingWrap) ratingWrap.style.display = 'none';
+
+    // 保留雷達底圖，但資料全部給 0
+    window.lastDynamicStats = [0, 0, 0, 0, 0];
+    if (activeCoffeeObj) {
+        renderRadarChart(activeCoffeeObj.name, [0, 0, 0, 0, 0]);
+    }
   }
   
   if (reviews.length === 0) {
@@ -1388,18 +1401,32 @@ window.showAlert = function(msg) {
     if (window.applyTranslation) window.applyTranslation();
   }
 
-  function renderTop5Coffees() {
+  async function renderTop5Coffees() {
     const top5Grid = document.getElementById('top5-grid');
     if (!top5Grid) return;
     
+    let allReviews = [];
+    if (window.firebaseDB) {
+        try { allReviews = await window.firebaseDB.getAllReviews(); } catch(e) {}
+    }
+
     let allCoffees = masterCoffees.map(c => {
         let country = c.name.split(' ')[0];
-        let baseScore = (c.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
+        let reviewsForCoffee = allReviews.filter(r => r.coffeeId === c.id);
+        let hasReviews = reviewsForCoffee.length > 0;
+        let scoreToDisplay = 0;
+        if (hasReviews) {
+            const sum = reviewsForCoffee.reduce((acc, r) => acc + parseFloat(r.userAvg || r.avg || 8), 0);
+            scoreToDisplay = (sum / reviewsForCoffee.length).toFixed(1);
+        } else {
+            scoreToDisplay = (c.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
+        }
         return {
             ...c,
             country: country,
             cafeName: c.cafes.join(', '),
-            score: parseFloat(baseScore)
+            score: parseFloat(scoreToDisplay),
+            hasReviews: hasReviews
         };
     });
 
@@ -1477,12 +1504,14 @@ window.showAlert = function(msg) {
           <div class="top5-info">
              <div class="top5-name">${coffee.name}</div>
              <div class="top5-meta">${coffee.cafeName} • 原豆單品</div>
+             ${coffee.hasReviews ? `
              <div class="top5-rate-row">
                  <div class="top5-score-box">
                     <span style="color:#f5c518; font-size:1.2rem;">★</span>
                     <span class="top5-score-val">${coffee.score.toFixed(1)}</span>
                  </div>
              </div>
+             ` : ''}
           </div>
         `;
         
@@ -1518,18 +1547,32 @@ window.showAlert = function(msg) {
     if (window.applyTranslation) window.applyTranslation();
   }
 
-  function renderDailyRandomCoffees() {
+  async function renderDailyRandomCoffees() {
     const dailyGrid = document.getElementById('daily-random-grid');
     if (!dailyGrid) return;
     
-        let allCoffees = masterCoffees.map(c => {
+    let allReviews = [];
+    if (window.firebaseDB) {
+        try { allReviews = await window.firebaseDB.getAllReviews(); } catch(e) {}
+    }
+    
+    let allCoffees = masterCoffees.map(c => {
         let country = c.name.split(' ')[0];
-        let baseScore = (c.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
+        let reviewsForCoffee = allReviews.filter(r => r.coffeeId === c.id);
+        let hasReviews = reviewsForCoffee.length > 0;
+        let scoreToDisplay = 0;
+        if (hasReviews) {
+            const sum = reviewsForCoffee.reduce((acc, r) => acc + parseFloat(r.userAvg || r.avg || 8), 0);
+            scoreToDisplay = (sum / reviewsForCoffee.length).toFixed(1);
+        } else {
+            scoreToDisplay = (c.stats.reduce((a,b)=>a+b,0) / 5 * 2).toFixed(1);
+        }
         return {
             ...c,
             country: country,
             cafeName: c.cafes.join(', '),
-            score: parseFloat(baseScore)
+            score: parseFloat(scoreToDisplay),
+            hasReviews: hasReviews
         };
     });
 
@@ -1602,12 +1645,14 @@ window.showAlert = function(msg) {
           <div class="top5-info">
              <div class="top5-name">${coffee.name}</div>
              <div class="top5-meta">${coffee.cafeName} • 原豆單品</div>
+             ${coffee.hasReviews ? `
              <div class="top5-rate-row">
                  <div class="top5-score-box">
                     <span style="color:#f5c518; font-size:1.2rem;">★</span>
                     <span class="top5-score-val">${coffee.score.toFixed(1)}</span>
                  </div>
              </div>
+             ` : ''}
           </div>
         `;
         
