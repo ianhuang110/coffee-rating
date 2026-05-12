@@ -1918,8 +1918,8 @@ window.showAlert = function(msg) {
             
             item.innerHTML = `
               <div style="display:flex; gap:15px; align-items:center;">
-                  <div style="flex-shrink:0; width:60px;">
-                      <img src="./${posterImg}" alt="poster" style="width:100%; border-radius:4px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:block;">
+                  <div style="flex-shrink:0; width:60px; overflow:hidden; border-radius:4px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                      <img src="./${posterImg}" alt="poster" style="width:100%; aspect-ratio:1/1.4; object-fit:cover; object-position:center; transform:scale(1.18); display:block;">
                   </div>
                   <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between; min-width:0;">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
