@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffee-rating-v17';
+const CACHE_NAME = 'coffee-rating-v18';
 const urlsToCache = [
   './',
   './index.html',
@@ -40,7 +40,9 @@ self.addEventListener('fetch', event => {
           });
         })
       .catch(() => {
-        return caches.match(event.request);
+        return caches.match(event.request).then(response => {
+          return response || new Response('', { status: 404 });
+        });
       })
   );
 });
