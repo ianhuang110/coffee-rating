@@ -1889,15 +1889,49 @@ window.showAlert = function(msg) {
                 textPreview = textPreview.substring(0, 60) + '...';
             }
             
+            let posterImg = 'coffee_poster.png';
+            if (coffee) {
+                let beanPosterMap = {
+                    't1': 'poster_panama_geisha.png', 't2': 'poster_ethiopia_hambela.png', 't3': 'poster_kenya_aa.png', 't4': 'poster_costa_rica_tarrazu.png',
+                    'p1': 'poster_ethiopia_yirgacheffe.png', 'p3': 'poster_indonesia_mandheling.png', 'p5': 'poster_colombia_pink_bourbon.png', 'p6': 'poster_guatemala_antigua.png', 'p7': 'poster_kenya_aa_alt.png', 'p8': 'poster_jamaica_blue_mountain.png',
+                    's1': 'poster_colombia_rose_valley.png', 's2': 'poster_costa_rica_mozart.png', 's3': 'poster_ethiopia_sidamo.png', 's4': 'poster_burundi.png', 's5': 'poster_el_salvador_pacamara.png',
+                    'ml1': 'poster_taiwan_alishan.png', 'ml3': 'poster_honduras.png',
+                    'jc2': 'poster_brazil_cerrado.png', 'jc4': 'poster_ethiopia_washed.png',
+                    'in2': 'poster_colombia_huila.png',
+                    'st1': 'poster_guatemala_huehuetenango.png', 'st2': 'poster_costa_rica_black_honey.png', 'st3': 'poster_ethiopia_heirloom.png',
+                    'wa1': 'poster_colombia_anaerobic.png',
+                    'h1': 'poster_el_salvador_refugio.png',
+                    'c1': 'poster_yemen_mocha.png',
+                    'k1': 'poster_rwanda.png', 'k2': 'poster_peru.png'
+                };
+                let posterMap = {
+                    '衣索比亞': 'poster_ethiopia_hambela.png', '肯亞': 'poster_kenya_aa.png', '盧安達': 'poster_ethiopia_hambela.png', '蒲隆地': 'poster_ethiopia_hambela.png',
+                    '哥倫比亞': 'poster_colombia.png', '薩爾瓦多': 'poster_colombia.png', '哥斯大黎加': 'poster_costa_rica_tarrazu.png', '瓜地馬拉': 'poster_colombia.png', '巴西': 'poster_colombia.png', '宏都拉斯': 'poster_colombia.png', '祕魯': 'poster_colombia.png', '牙買加': 'poster_colombia.png', '巴拿馬': 'poster_panama_geisha.png', '印尼': 'poster_indonesia_mandheling.png', '葉門': 'poster_indonesia_mandheling.png', '台灣': 'poster_taiwan.png'
+                };
+                Object.keys(posterMap).forEach(key => {
+                    if (coffee.name.includes(key)) posterImg = posterMap[key];
+                });
+                if (beanPosterMap[coffee.id]) {
+                    posterImg = beanPosterMap[coffee.id];
+                }
+            }
+            
             item.innerHTML = `
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                <div style="font-weight:bold; color:var(--accent-gold); font-size:1.05rem;">${coffeeName}</div>
-                <span style="color:#888; font-size:0.85rem;">${r.date}</span>
-              </div>
-              <div style="font-size:1rem; color:#666; line-height: 1.5; margin-bottom: 10px;">"${textPreview}"</div>
-              <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px dashed #ccc; padding-top: 8px;">
-                <span style="color:#888; font-size: 0.9rem;">來自 <strong>${author}</strong></span>
-                <strong style="color:var(--accent-gold); font-size: 0.9rem;">評分: ${scoreToDisplay} / 10</strong>
+              <div style="display:flex; gap:15px; align-items:center;">
+                  <div style="flex-shrink:0; width:60px;">
+                      <img src="./${posterImg}" alt="poster" style="width:100%; border-radius:4px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:block;">
+                  </div>
+                  <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between; min-width:0;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                        <div style="font-weight:bold; color:var(--accent-gold); font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${coffeeName}</div>
+                        <span style="color:#888; font-size:0.85rem; flex-shrink:0; margin-left:10px;">${r.date}</span>
+                      </div>
+                      <div style="font-size:1rem; color:#666; line-height: 1.5; margin-bottom: 10px;">"${textPreview}"</div>
+                      <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px dashed #ccc; padding-top: 8px;">
+                        <span style="color:#888; font-size: 0.9rem;">來自 <strong>${author}</strong></span>
+                        <strong style="color:var(--accent-gold); font-size: 0.9rem;">評分: ${scoreToDisplay} / 10</strong>
+                      </div>
+                  </div>
               </div>
             `;
             container.appendChild(item);

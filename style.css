@@ -582,60 +582,54 @@ body {
   position: relative;
   width: 100%;
   min-height: 250px;
-  background-color: rgb(var(--banner-rgb, 15, 15, 15));
-  color: #fff;
+  background-color: transparent;
+  color: var(--text-main);
   display: flex;
   align-items: flex-end;
 }
 
 /* Blurred Background */
 .imdb-banner-bg {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-size: cover;
-  background-position: center;
-  filter: blur(15px) brightness(0.6); /* 稍微調亮模糊層，讓顏色透出來 */
-  z-index: 1;
+  display: none;
 }
 
 .imdb-banner-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--flag-gradient, linear-gradient(to top, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0.3) 100%));
-  z-index: 2;
-  pointer-events: none;
+  display: none;
 }
 
 .imdb-banner-content {
   position: relative;
   z-index: 3;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 20px;
   padding: 3rem 2rem 1.5rem 2rem;
   width: 100%;
-  align-items: flex-end;
   pointer-events: auto;
 }
 
 /* Poster Image */
 .imdb-poster {
-  width: 140px;
+  width: 250px;
   flex-shrink: 0;
-  box-shadow: 0 0 20px rgba(0,0,0,0.8);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
 }
 .imdb-poster img {
   width: 100%;
-  border-radius: 4px;
+  border-radius: 8px;
   display: block;
 }
 
 /* Info Section */
 .imdb-info {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .imdb-title {
@@ -643,13 +637,13 @@ body {
   font-size: 2.2rem;
   margin: 0 0 5px 0;
   line-height: 1.2;
-  color: #fff;
-  text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+  color: var(--text-main);
+  text-shadow: none;
 }
 
 .imdb-subtitle {
   font-size: 1rem;
-  color: #ccc;
+  color: var(--text-muted);
   margin: 0 0 15px 0;
   font-weight: 400;
 }
@@ -657,6 +651,7 @@ body {
 /* Rating Area */
 .imdb-rating-wrap {
   display: flex;
+  justify-content: center;
   gap: 30px;
   align-items: center;
 }
@@ -671,7 +666,7 @@ body {
   font-family: 'Arial', sans-serif;
   font-size: 0.75rem;
   letter-spacing: 1px;
-  color: #aaa;
+  color: var(--text-muted);
   font-weight: 700;
 }
 
@@ -682,12 +677,12 @@ body {
 .imdb-score {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #fff;
+  color: var(--text-main);
   line-height: 1;
 }
 .imdb-max {
   font-size: 1rem;
-  color: #aaa;
+  color: var(--text-muted);
   margin-left: 2px;
 }
 .imdb-star {
@@ -1050,7 +1045,7 @@ body {
     gap: 15px;
   }
   .imdb-poster {
-    width: 100px;
+    width: 200px;
   }
   .imdb-title {
     font-size: 1.5rem;
