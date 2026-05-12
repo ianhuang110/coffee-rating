@@ -110,35 +110,37 @@ const cafeCoordinates = {
       const posterIcon = L.divIcon({
           className: 'coffee-poster-icon',
           html: `<div style="
-              width: 80px; 
-              height: 110px; 
-              background-image: url('${targetCoffee.poster}'); 
-              background-size: cover; 
-              background-position: center; 
+              width: 150px; 
+              height: 210px; 
               border: 2px solid #cda25b; 
               border-radius: 8px; 
               box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-              position: relative;">
+              position: relative;
+              overflow: hidden;">
+              <img src="${targetCoffee.poster}" style="
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  object-position: center;
+                  transform: scale(1.18);
+                  display: block;">
               <div style="
                   position: absolute; 
                   bottom: 0; 
                   left: 0; 
                   right: 0; 
-                  background: rgba(0,0,0,0.7); 
+                  background: rgba(0,0,0,0.8); 
                   color: white; 
-                  font-size: 10px; 
+                  font-size: 13px; 
                   text-align: center; 
-                  padding: 2px; 
-                  border-bottom-left-radius: 6px; 
-                  border-bottom-right-radius: 6px;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;">
+                  padding: 6px 4px; 
+                  white-space: normal;
+                  line-height: 1.3;">
                   ${targetCoffee.name}
               </div>
           </div>`,
-          iconSize: [80, 110],
-          iconAnchor: [40, 55]
+          iconSize: [150, 210],
+          iconAnchor: [75, 105]
       });
       
       L.marker(posterCenter, { icon: posterIcon, interactive: false }).addTo(map);
